@@ -4,88 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
+    <script src="checklogin.js" type="module"></script>
+    <script src="login.js" type="module"></script>
 </head>
 <body>
-    <button id="login">Login With Google(WIP)</button>
-    
-    <h1>Seating Plan Generator</h1>
-
-    <form id="seatingForm">
-        <label for="rows">Number of rows:</label>
-        <input type="number" id="rows" name="rows" min="1" value="5"><br><br>
-        <label for="seatsPerRow">Seats per row:</label>
-        <input type="number" id="seatsPerRow" name="seatsPerRow" min="1" value="6"><br><br>
-        <button type="button" onclick="generateSeatingPlan()">Generate Seating Plan</button>
-    </form>
-
-    <div id="seatingPlan"></div>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
-    <script>
-      var firebaseConfig = {
-        apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
-        authDomain: "seat-87c59.firebaseapp.com",
-        projectId: "seat-87c59",
-        storageBucket: "seat-87c59.appspot.com",
-        messagingSenderId: "1061951130301",
-        appId: "1:1061951130301:web:5693c4edf70073334085d4",
-        measurementId: "G-4996WZXJ2R"
-      };
-
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-
-      console.log('stuff works')
-      document.getElementById('login').addEventListener('click', GoogleLogin)
-
-      let provider = new firebase.auth.GoogleAuthProvider();
-
-      function GoogleLogin(){
-        console.log('Logging in')
-        firebase.auth().signInWithPopup(provider).then(result => {
-          console.log(result.user)
-        }).catch((error) => {
-          console.log(error)
-        });
-      }
-
-      function generateSeatingPlan() {
-          var rows = parseInt(document.getElementById('rows').value);
-          var seatsPerRow = parseInt(document.getElementById('seatsPerRow').value);
-          var seatingPlan = generateRandomSeatingPlan(rows, seatsPerRow);
-          var seatingPlanHtml = '<table>';
-          for (var i = 0; i < seatingPlan.length; i++) {
-              seatingPlanHtml += '<tr>';
-              for (var j = 0; j < seatingPlan[i].length; j++) {
-                  seatingPlanHtml += '<td>' + seatingPlan[i][j] + '</td>';
-              }
-              seatingPlanHtml += '</tr>';
-          }
-          seatingPlanHtml += '</table>';
-          document.getElementById('seatingPlan').innerHTML = seatingPlanHtml;
-      }
-
-      function generateRandomSeatingPlan(rows, seatsPerRow) {
-          var seatingPlan = [];
-          for (var row = 1; row <= rows; row++) {
-              var rowSeats = [];
-              for (var seat = 1; seat <= seatsPerRow; seat++) {
-                  rowSeats.push(row + '-' + seat);
-              }
-              seatingPlan.push(rowSeats);
-          }
-          shuffleArray(seatingPlan);
-          return seatingPlan;
-      }
-
-      function shuffleArray(array) {
-          for (var i = array.length - 1; i > 0; i--) {
-              var j = Math.floor(Math.random() * (i + 1));
-              var temp = array[i];
-              array[i] = array[j];
-              array[j] = temp;
-          }
-      }
-    </script>
+    <div id="loginpage" style="display: none;">
+        
+        <button id="login">Login With Google(WIP)</button>
+        <h1>Seating Plan Generator</h1>
+    </div>
 </body>
 </html>
