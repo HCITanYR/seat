@@ -56,13 +56,14 @@ function updateProfile(user) {
     const profile = user.photoURL;
     console.log(username, email, profile);
 
-    document.getElementById("title").textContent = "Welcome back, " + username + "!";
+    document.getElementById("user-name").textContent = username;
 }
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("logged in");
         console.log(window.location.pathname);
+        console.log("im appparently trying to hide loginpage");
         document.getElementById("homepage").style.display = "block";
         document.getElementById("loginpage").style.display = "none";
         updateProfile(user)
