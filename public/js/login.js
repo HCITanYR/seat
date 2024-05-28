@@ -1,7 +1,7 @@
 console.log('imported this script yay');
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -22,9 +22,19 @@ const user = auth.currentUser;
 let provider = new GoogleAuthProvider();
 
 console.log('stuff works');
-if (window.location.pathname === "/") {
-    document.getElementById('login').addEventListener('click', GoogleLogin);
-}
+document.getElementById('login').addEventListener('click', GoogleLogin);
+document.getElementById('logout').addEventListener('click', (e) => {
+    console.log('Logging out');
+    e.preventDefault();
+    signOut(auth).then(() => {
+        console.log('logged out');
+        window.location.href = '/';
+    }
+    ).catch((error) => {
+        console.log(error);
+    });
+});
+
 
 function GoogleLogin() {
     console.log('Logging in');
@@ -35,7 +45,6 @@ function GoogleLogin() {
         }
         const user = result.user;
         console.log(user);
-        window.location.href = "../home.html";
     }).catch((error) => {
         console.log(error);
     });
@@ -47,8 +56,7 @@ function updateProfile(user) {
     const profile = user.photoURL;
     console.log(username, email, profile);
 
-    document.getElementById("title").textContent = "Logged in as";
-    document.getElementById("username").textContent = username;
+    document.getElementById("title").textContent = "Welcome back, " + username + "!";
     document.getElementById("email").textContent = email;
     document.getElementById("profile").src = profile;
 }
@@ -57,23 +65,12 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("logged in");
         console.log(window.location.pathname);
-        if (window.location.pathname === "/") {
-            console.log("redirecting to home page");
-            window.location.href = "../home.html";
-        }
-        if (window.location.pathname.endsWith("home.html")) {
-            console.log("displaying home page");
-            updateProfile(user);
-        }
+        document.getElementById("homepage").style.display = "block";
+        document.getElementById("loginpage").style.display = "none";
+        updateProfile(user)
     } else {
         console.log("not logged in");
-        if (window.location.pathname !== "/") {
-            console.log("redirecting to login page");
-            window.location.href = "../";
-        } 
-        if (window.location.pathname === "/") {
-            console.log("displaying login page");
-            document.getElementById("loginpage").style.display = "block";
-        }
+        document.getElementById("homepage").style.display = "none";
+        document.getElementById("loginpage").style.display = "block";
     }
 });
