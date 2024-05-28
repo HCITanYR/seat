@@ -5,19 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
     <script src="js/login.js" type="module"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+        }
+        .design-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .design-card img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .new-design {
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .new-design i {
+            font-size: 40px;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
     <div id="loginpage" style="display: none;">
         <button id="login">Login With Google</button>
         <h1>Seating Plan Generator</h1>
     </div>
-    <div id="homepage">
-        <h1 id="title"></h1>
-        <h2 id="email"></h2>
-        <img id="profile">
-        <button id="logout">Logout</button>
+    <div id="homepage" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>SEATING PLAN GENERATOR</h1>
+            <button class="btn btn-outline-dark" id="logout">Log Out</button>
+        </div>
+        <h2 id="title">Welcome back, TAN YOU REN HCI!</h2>
+        <h3 class="mt-4">Recent designs</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="design-card">
+                    <img src="https://via.placeholder.com/150" alt="3A3 Seating Plan">
+                    <p>3A3 Seating Plan</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="design-card">
+                    <img src="https://via.placeholder.com/150" alt="Auditorium">
+                    <p>Auditorium</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="design-card">
+                    <img src="https://via.placeholder.com/150" alt="Kah Kee Hall">
+                    <p>Kah Kee Hall</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="design-card">
+                    <img src="https://via.placeholder.com/150" alt="Terraces CSM">
+                    <p>Terraces CSM</p>
+                </div>
+            </div>
+        </div>
+        <h3 class="mt-4">Or, curate a new design:</h3>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="new-design">
+                    <i class="fas fa-plus"></i>
+                    <p>Blank</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="new-design">
+                    <i class="fas fa-file-alt"></i>
+                    <p>Templates</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="new-design">
+                    <i class="fas fa-copy"></i>
+                    <p>Duplicate Existing</p>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

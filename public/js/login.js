@@ -1,7 +1,7 @@
 console.log('imported this script yay');
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -38,7 +38,7 @@ document.getElementById('logout').addEventListener('click', (e) => {
 
 function GoogleLogin() {
     console.log('Logging in');
-    signInWithPopup(auth, provider).then(result => {
+    signInWithRedirect(auth, provider).then(result => {
         if (result.credential) {
             var credential = result.credential;
             var token = credential.accessToken;
@@ -57,8 +57,6 @@ function updateProfile(user) {
     console.log(username, email, profile);
 
     document.getElementById("title").textContent = "Welcome back, " + username + "!";
-    document.getElementById("email").textContent = email;
-    document.getElementById("profile").src = profile;
 }
 
 onAuthStateChanged(auth, (user) => {
