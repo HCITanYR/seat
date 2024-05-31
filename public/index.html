@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
     <script src="js/login.js" type="module"></script>
+    <script src="js/firestore.js" type="module"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -33,13 +34,30 @@
             font-size: 40px;
             color: #aaa;
         }
+        .hover-darken {
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+        .hover-darken:hover {
+            background-color: rgba(0, 0, 0, 0.040); /* Adjust the alpha value to control the darkness */
+        }
+        .hover-darken img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .hover-darken p {
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
     <!-- Firebase scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
-<body style="background-color: #f2f2f2">
+<body style="background-color: #ffffff">
     <div class="container">
         <div id="loginpage" style="display: none;">
             <div class="d-flex flex-column justify-content-center align-items-center mb-4 border border-dark bg-white m-5 p-5 rounded">
@@ -59,26 +77,26 @@
             <h3 class="mt-4">Recent designs</h3>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="design-card">
+                    <div class="design-card hover-darken">
                         <img src="https://via.placeholder.com/150" alt="3A3 Seating Plan" >
                         <p>3A3 Seating Plan</p>
                     </div>
                 </div>
-                <div class="col-md-3 ">
-                    <div class="design-card">
+                <div class="col-md-3" >
+                    <div class="design-card hover-darken">
                         <img src="https://via.placeholder.com/150" alt="Auditorium">
                         <p>Auditorium</p>
                     </div>
                 </div>
-                <div class="col-md-3 ">
-                    <div class="design-card">
-                        <img src="https://via.placeholder.com/150" alt="Kah Kee Hall">
+                <div class="col-md-3" >
+                    <div class="design-card hover-darken">
+                        <img src="https://via.placeholder.com/150" alt="Auditorium">
                         <p>Kah Kee Hall</p>
                     </div>
                 </div>
-                <div class="col-md-3 ">
-                    <div class="design-card">
-                        <img src="https://via.placeholder.com/150" alt="Terraces CSM">
+                <div class="col-md-3" >
+                    <div class="design-card hover-darken">
+                        <img src="https://via.placeholder.com/150" alt="Auditorium">
                         <p>Terraces CSM</p>
                     </div>
                 </div>
@@ -86,7 +104,7 @@
             <h3 class="mt-4">Or, curate a new design:</h3>
             <div class="row">
                 <div class="col-md-4">
-                    <div class="new-design">
+                    <div class="new-design" id="create">
                         <i class="fas fa-plus"></i>
                         <p>Blank</p>
                     </div>

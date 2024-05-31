@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seating Plan Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        .seating-plan {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .seat {
+            width: 100px;
+            height: 100px;
+            background-color: #d2a679;
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #000;
+        }
+        .locked {
+            position: relative;
+        }
+        .locked:before {
+            content: '\f023';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 14px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">3A3 Seating Plan</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4>Students</h4>
+                <button class="btn btn-outline-primary mb-2">+ New Student</button>
+                <div id="students-list">
+                    <div class="student" data-preference="front">You Ren <span class="badge badge-danger">!</span></div>
+                    <div class="student locked">Han Yang</div>
+                    <div class="student">Kieran</div>
+                </div>
+                <button class="btn btn-outline-secondary mt-2">Import from CSV</button>
+            </div>
+            <div>
+                <label for="layout-rows">Layout: </label>
+                <input type="number" id="layout-rows" value="2" min="1" max="10">
+                by
+                <input type="number" id="layout-columns" value="2" min="1" max="10">
+            </div>
+            <div>
+                <button class="btn btn-outline-secondary">Undo</button>
+                <button class="btn btn-outline-secondary">Redo</button>
+            </div>
+        </div>
+        <div class="seating-plan" id="seating-plan">
+            <div class="seat" data-seat="1a">You Ren</div>
+            <div class="seat locked" data-seat="1b">Han Yang</div>
+            <div class="seat" data-seat="2a">Kieran</div>
+            <div class="seat" data-seat="2b">Ming Xuan</div>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <button class="btn btn-outline-primary" id="add-row">Add row</button>
+            <button class="btn btn-outline-primary ml-2" id="add-column">Add column</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        // Function to update the seating layout based on input values
+        function updateSeatingLayout(rows, cols) {
+            const seatingPlan = document.getElementById('seating-plan');
+            seatingPlan.innerHTML = '';
+            for (let i = 1; i <= rows; i++) {
+                for (let j = 1; j <= cols; j++) {
+                    const seat = document.createElement('div');
+                    seat.className = 'seat';
+                    seat.dataset.seat = `${i}${String.fromCharCode(96 + j)}`;
+                    seatingPlan.appendChild(seat);
+                }
+            }
+        }
+
+        // Add row function
+        function addRow() {
+            const rowsInput = document.getElementById('layout-rows');
+            rowsInput.value = parseInt(rowsInput.value) + 1;
+            const rows = parseInt(rowsInput.value);
+            const cols = parseInt(document.getElementById('layout-columns').value);
+            updateSeatingLayout(rows, cols);
+        }
+
+        // Add column function
+        function addColumn() {
+            const colsInput = document.getElementById('layout-columns');
+            colsInput.value = parseInt(colsInput.value) + 1;
+            const cols = parseInt(colsInput.value);
+            const rows = parseInt(document.getElementById('layout-rows').value);
+            updateSeatingLayout(rows, cols);
+        }
+
+        document.getElementById('layout-rows').addEventListener('change', function() {
+            const rows = parseInt(this.value);
+            const cols = parseInt(document.getElementById('layout-columns').value);
+            updateSeatingLayout(rows, cols);
+        });
+
+        document.getElementById('layout-columns').addEventListener('change', function() {
+            const cols = parseInt(this.value);
+            const rows = parseInt(document.getElementById('layout-rows').value);
+            updateSeatingLayout(rows, cols);
+        });
+
+        document.getElementById('add-row').addEventListener('click', addRow);
+        document.getElementById('add-column').addEventListener('click', addColumn);
+
+        // Initial layout setup
+        updateSeatingLayout(2, 2);
+    </script>
+</body>
+</html>

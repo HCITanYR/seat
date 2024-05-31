@@ -2,6 +2,7 @@ console.log('imported this script yay');
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getUid, setUid } from './uid.js';
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -44,7 +45,7 @@ function GoogleLogin() {
             var token = credential.accessToken;
         }
         const user = result.user;
-        console.log(user);
+        setUid(user.uid);
     }).catch((error) => {
         console.log(error);
     });
@@ -55,7 +56,8 @@ function updateProfile(user) {
     const email = user.email;
     const profile = user.photoURL;
     console.log(username, email, profile);
-
+    console.log('im outpuitting the uid')
+    console.log(getUid());
     document.getElementById("user-name").textContent = username;
 }
 
