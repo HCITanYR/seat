@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -11,10 +12,19 @@
         }
         .seating-plan {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            margin-top: 20px;
         }
+        #zoomable-content {
+            overflow: auto;
+            height: 300px;
+        }
+        .row {
+            display: flex;
+            justify-content: center;
+        }
+
         .seat {
             width: 100px;
             height: 100px;
@@ -41,6 +51,7 @@
             font-size: 14px;
             color: #000;
         }
+        
     </style>
 </head>
 <body>
@@ -68,15 +79,19 @@
                 <button class="btn btn-outline-secondary">Redo</button>
             </div>
         </div>
-        <div class="seating-plan" id="seating-plan">
-            <div class="seat" data-seat="1a">You Ren</div>
-            <div class="seat locked" data-seat="1b">Han Yang</div>
-            <div class="seat" data-seat="2a">Kieran</div>
-            <div class="seat" data-seat="2b">Ming Xuan</div>
+        <div id="zoomable-content" class="bg-info">
+            <div class="seating-plan" id="seating-plan">
+                <div class="seat" data-seat="1a">You Ren</div>
+                <div class="seat locked" data-seat="1b">Han Yang</div>
+                <div class="seat" data-seat="2a">Kieran</div>
+                <div class="seat" data-seat="2b">Ming Xuan</div>
+            </div>
         </div>
         <div class="d-flex justify-content-center mt-4">
-            <button class="btn btn-outline-primary" id="add-row">Add row</button>
-            <button class="btn btn-outline-primary ml-2" id="add-column">Add column</button>
+            <button class="btn btn-outline-primary m-2" id="add-row">Add row</button>
+            <button class="btn btn-outline-primary m-2" id="add-column">Add column</button>
+            <button id="zoom-in" class="btn btn-outline-secondary m-2"><i class="fas fa-search-plus"></i></button>
+            <button id="zoom-out" class="btn btn-outline-secondary m-2"><i class="fas fa-search-minus"></i></button>
         </div>
     </div>
 
@@ -86,55 +101,73 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
-        // Function to update the seating layout based on input values
-        function updateSeatingLayout(rows, cols) {
-            const seatingPlan = document.getElementById('seating-plan');
-            seatingPlan.innerHTML = '';
-            for (let i = 1; i <= rows; i++) {
-                for (let j = 1; j <= cols; j++) {
-                    const seat = document.createElement('div');
-                    seat.className = 'seat';
-                    seat.dataset.seat = `${i}${String.fromCharCode(96 + j)}`;
-                    seatingPlan.appendChild(seat);
-                }
-            }
-        }
+        // Zoom in function
+        let scale = 1;
+        const content = document.getElementById('seating-plan'); // Changed from 'zoomable-content' to 'seating-plan'
+        const zoomInButton = document.getElementById('zoom-in');
+        const zoomOutButton = document.getElementById('zoom-out');
 
-        // Add row function
-        function addRow() {
-            const rowsInput = document.getElementById('layout-rows');
-            rowsInput.value = parseInt(rowsInput.value) + 1;
-            const rows = parseInt(rowsInput.value);
-            const cols = parseInt(document.getElementById('layout-columns').value);
-            updateSeatingLayout(rows, cols);
-        }
-
-        // Add column function
-        function addColumn() {
-            const colsInput = document.getElementById('layout-columns');
-            colsInput.value = parseInt(colsInput.value) + 1;
-            const cols = parseInt(colsInput.value);
-            const rows = parseInt(document.getElementById('layout-rows').value);
-            updateSeatingLayout(rows, cols);
-        }
-
-        document.getElementById('layout-rows').addEventListener('change', function() {
-            const rows = parseInt(this.value);
-            const cols = parseInt(document.getElementById('layout-columns').value);
-            updateSeatingLayout(rows, cols);
+        zoomInButton.addEventListener('click', () => {
+            scale += 0.1;
+            content.style.transform = `scale(${scale})`;
         });
 
-        document.getElementById('layout-columns').addEventListener('change', function() {
-            const cols = parseInt(this.value);
-            const rows = parseInt(document.getElementById('layout-rows').value);
-            updateSeatingLayout(rows, cols);
+        zoomOutButton.addEventListener('click', () => {
+            scale -= 0.1;
+            content.style.transform = `scale(${scale})`;
         });
-
-        document.getElementById('add-row').addEventListener('click', addRow);
-        document.getElementById('add-column').addEventListener('click', addColumn);
-
-        // Initial layout setup
-        updateSeatingLayout(2, 2);
     </script>
+    <script>
+    // Update seating layout function
+    function updateSeatingLayout(rows, cols) {
+    const seatingPlan = document.querySelector('.seating-plan');
+    seatingPlan.innerHTML = ''; // Clear any existing seats
+
+    for (let i = 0; i < rows; i++) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        seatingPlan.appendChild(row);
+
+        for (let j = 0; j < cols; j++) {
+            const seat = document.createElement('div');
+            seat.className = 'seat';
+            seat.textContent = `${i+1}-${j+1}`; // Add seat number
+            row.appendChild(seat);
+        }
+    }
+}
+
+    // Add row function
+    function addRow() {
+        const rowsInput = document.getElementById('layout-rows');
+        rowsInput.value = parseInt(rowsInput.value) + 1;
+        const rows = parseInt(rowsInput.value);
+        const cols = parseInt(document.getElementById('layout-columns').value);
+        updateSeatingLayout(rows, cols);
+    }
+
+    // Add column function
+    function addColumn() {
+        const colsInput = document.getElementById('layout-columns');
+        colsInput.value = parseInt(colsInput.value) + 1;
+        const cols = parseInt(colsInput.value);
+        const rows = parseInt(document.getElementById('layout-rows').value);
+        updateSeatingLayout(rows, cols);
+    }
+
+    // Event listener for changes in number of rows
+    document.getElementById('layout-rows').addEventListener('change', function() {
+        const rows = parseInt(this.value);
+        const cols = parseInt(document.getElementById('layout-columns').value);
+        updateSeatingLayout(rows, cols);
+    });
+
+    // Event listener for changes in number of columns
+    document.getElementById('layout-columns').addEventListener('change', function() {
+        const cols = parseInt(this.value);
+        const rows = parseInt(document.getElementById('layout-rows').value);
+        updateSeatingLayout(rows, cols);
+    });
+</script>
 </body>
 </html>
