@@ -3,6 +3,7 @@ console.log('imported this script yay');
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 import { getUid, setUid } from './uid.js';
+import { loadDesigns } from './firestore.js';
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -69,6 +70,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById("homepage").style.display = "block";
         document.getElementById("loginpage").style.display = "none";
         updateProfile(user)
+        loadDesigns();
     } else {
         console.log("not logged in");
         document.getElementById("homepage").style.display = "none";
