@@ -55,43 +55,59 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center my-4">3A3 Seating Plan</h1>
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h4>Students</h4>
-                <button class="btn btn-outline-primary mb-2">+ New Student</button>
-                <div id="students-list">
+    <div class="container-fluid p-4 d-flex flex-column" style="height: 100vh;">
+        <h1 class="text-center">3A3 Seating Plan</h1>
+        <div class="row flex-grow-1">
+            <div class="col-md-3 d-flex flex-column">
+                <!-- Student list -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Students</h2>
+                    <button class="btn btn-outline-secondary">Import from CSV</button>
+                </div>
+                <input type="text" id="new-student" placeholder="Enter new student's name" style="width: 100%;">
+                <p id="error-message" style="color: red;"></p>
+                <div id="students-list" style="overflow-y: auto; flex-grow: 1; max-height: calc(100vh - 200px);">
+                    <!-- Existing students go here -->
                     <div class="student" data-preference="front">You Ren <span class="badge badge-danger">!</span></div>
                     <div class="student locked">Han Yang</div>
                     <div class="student">Kieran</div>
+                    <!-- Add more students as needed -->
                 </div>
-                <button class="btn btn-outline-secondary mt-2">Import from CSV</button>
             </div>
-            <div>
-                <label for="layout-rows">Layout: </label>
-                <input type="number" id="layout-rows" value="2" min="1" max="10">
-                by
-                <input type="number" id="layout-columns" value="2" min="1" max="10">
+
+            <div class="col-md-9 d-flex flex-column">
+                <div class="row flex-grow-1">
+                    <div class="col-md-12 d-flex flex-column">
+                        <div class="d-flex justify-content-start mb-2">
+                            <div class="mr-2">
+                                <label for="layout-rows">Layout: </label>
+                                <input type="number" id="layout-rows" value="2" min="1" max="10">
+                                by
+                                <input type="number" id="layout-columns" value="2" min="1" max="10">
+                            </div>
+                            <div class="ml-auto">
+                                <button class="btn btn-outline-secondary mr-2">Undo</button>
+                                <button class="btn btn-outline-secondary">Redo</button>
+                            </div>
+                        </div>
+                        <!-- Seating plan layout -->
+                        <div id="zoomable-content" class="bg-info flex-grow-1 d-flex justify-content-center align-items-center">
+                            <div class="seating-plan" id="seating-plan">
+                                <div class="seat" data-seat="1a">You Ren</div>
+                                <div class="seat locked" data-seat="1b">Han Yang</div>
+                                <div class="seat" data-seat="2a">Kieran</div>
+                                <div class="seat" data-seat="2b">Ming Xuan</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <button class="btn btn-outline-primary m-2" id="add-row">Add row</button>
+                            <button class="btn btn-outline-primary m-2" id="add-column">Add column</button>
+                            <button id="zoom-in" class="btn btn-outline-secondary m-2"><i class="fas fa-search-plus"></i></button>
+                            <button id="zoom-out" class="btn btn-outline-secondary m-2"><i class="fas fa-search-minus"></i></button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <button class="btn btn-outline-secondary">Undo</button>
-                <button class="btn btn-outline-secondary">Redo</button>
-            </div>
-        </div>
-        <div id="zoomable-content" class="bg-info">
-            <div class="seating-plan" id="seating-plan">
-                <div class="seat" data-seat="1a">You Ren</div>
-                <div class="seat locked" data-seat="1b">Han Yang</div>
-                <div class="seat" data-seat="2a">Kieran</div>
-                <div class="seat" data-seat="2b">Ming Xuan</div>
-            </div>
-        </div>
-        <div class="d-flex justify-content-center mt-4">
-            <button class="btn btn-outline-primary m-2" id="add-row">Add row</button>
-            <button class="btn btn-outline-primary m-2" id="add-column">Add column</button>
-            <button id="zoom-in" class="btn btn-outline-secondary m-2"><i class="fas fa-search-plus"></i></button>
-            <button id="zoom-out" class="btn btn-outline-secondary m-2"><i class="fas fa-search-minus"></i></button>
         </div>
     </div>
 
@@ -101,6 +117,84 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
+        // Add new student function
+        document.getElementById('new-student').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                var studentName = e.target.value;
+                var studentList = document.getElementById('students-list');
+                var students = Array.from(studentList.getElementsByClassName('student'));
+                var names = students.map(student => student.textContent);
+                var errorMessage = document.getElementById('error-message');
+                errorMessage.textContent = ''; // Clear previous error message
+                if (studentName) {
+                    if (names.includes(studentName)) {
+                        errorMessage.textContent = 'Error: Student name already exists!';
+                    } else {
+                        var newStudent = document.createElement('div');
+                        newStudent.className = 'student';
+                        newStudent.textContent = studentName;
+                        studentList.appendChild(newStudent);
+                        e.target.value = '';
+                        addEditEventListener(newStudent);
+                    }
+                }
+                e.preventDefault(); // Prevent form submission
+            }
+        });
+
+        // Function to add event listener for editing names
+        function addEditEventListener(student) {
+            student.addEventListener('click', function(e) {
+                var originalName = e.target.textContent.trim();
+                var input = document.createElement('input');
+                input.type = 'text';
+                input.value = originalName;
+                e.target.textContent = '';
+                e.target.appendChild(input);
+                input.focus();
+
+                function handleInput(e) {
+                    var newName = e.target.value.trim();
+                    var names = Array.from(studentList.getElementsByClassName('student')).map(function(student) {
+                        return student.textContent.trim();
+                    });
+
+                    // Remove the name of the student being edited from the list of names
+                    var index = names.indexOf(originalName);
+                    if (index !== -1) {
+                        names.splice(index, 1);
+                    }
+
+                    if (names.includes(newName)) {
+                        alert("This name already exists!");
+                        e.target.parentElement.textContent = originalName;
+                    } else {
+                        e.target.parentElement.textContent = newName;
+                    }
+
+                    // Remove the input element
+                    e.target.remove();
+                }
+
+                input.addEventListener('blur', handleInput);
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent form submission
+                        input.removeEventListener('blur', handleInput); // Remove blur event listener
+                        handleInput(e);
+                    }
+                });
+            });
+        }
+
+        // Edit student name function
+        var studentList = document.getElementById('students-list');
+        var students = studentList.getElementsByClassName('student');
+
+        for (var i = 0; i < students.length; i++) {
+            addEditEventListener(students[i]);
+        }
+
         // Zoom in function
         let scale = 1;
         const content = document.getElementById('seating-plan'); // Changed from 'zoomable-content' to 'seating-plan'
