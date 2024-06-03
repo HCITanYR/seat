@@ -87,8 +87,8 @@
                                 <input type="number" id="layout-columns" value="2" min="1" max="10">
                             </div>
                             <div class="ml-auto">
-                                <button class="btn btn-outline-secondary mr-2">Undo</button>
-                                <button class="btn btn-outline-secondary">Redo</button>
+                                <button class="btn btn-outline-secondary mr-2" id="undo-btn">Undo</button>
+                                <button class="btn btn-outline-secondary" id="redo-btn">Redo</button>
                             </div>
                         </div>
                         <!-- Seating plan layout -->
@@ -118,6 +118,53 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
+        // History state management
+        const history = [];
+        let historyIndex = -1;
+
+        function saveState() {
+            const state = {
+                students: document.getElementById('students-list').innerHTML,
+                seatingPlan: document.getElementById('seating-plan').innerHTML,
+                rows: document.getElementById('layout-rows').value,
+                cols: document.getElementById('layout-columns').value
+            };
+            if (historyIndex < history.length - 1) {
+                history.splice(historyIndex + 1);
+            }
+            history.push(state);
+            if (history.length > 25) {
+                history.shift();
+            } else {
+                historyIndex++;
+            }
+        }
+
+        function applyState(state) {
+            document.getElementById('students-list').innerHTML = state.students;
+            document.getElementById('seating-plan').innerHTML = state.seatingPlan;
+            document.getElementById('layout-rows').value = state.rows;
+            document.getElementById('layout-columns').value = state.cols;
+            attachEventListeners();
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                applyState(history[historyIndex]);
+            }
+        }
+
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                applyState(history[historyIndex]);
+            }
+        }
+
+        document.getElementById('undo-btn').addEventListener('click', undo);
+        document.getElementById('redo-btn').addEventListener('click', redo);
+
         // Add new student function
         document.getElementById('new-student').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
@@ -137,6 +184,7 @@
                         studentList.appendChild(newStudent);
                         e.target.value = '';
                         addEditEventListener(newStudent);
+                        saveState(); // Save state after adding new student
                     }
                 }
                 e.preventDefault(); // Prevent form submission
@@ -167,18 +215,16 @@
                     }
 
                     if (names.includes(newName)) {
-                        alert("This name already exists!");
-                        e.target.parentElement.textContent = originalName;
+                        alert("This name already exists. Please choose a different name.");
+                        e.target.value = originalName; // Revert to original name
                     } else {
                         e.target.parentElement.textContent = newName;
+                        saveState(); // Save state after editing student name
                     }
-
-                    // Remove the input element
-                    e.target.remove();
                 }
 
                 input.addEventListener('blur', handleInput);
-                input.addEventListener('keydown', function(e) {
+                input.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault(); // Prevent form submission
                         input.removeEventListener('blur', handleInput); // Remove blur event listener
@@ -211,58 +257,73 @@
             scale -= 0.1;
             content.style.transform = `scale(${scale})`;
         });
-    </script>
-    <script>
-    // Update seating layout function
-    function updateSeatingLayout(rows, cols) {
-    const seatingPlan = document.querySelector('.seating-plan');
-    seatingPlan.innerHTML = ''; // Clear any existing seats
 
-    for (let i = 0; i < rows; i++) {
-        const row = document.createElement('div');
-        row.className = 'row';
-        seatingPlan.appendChild(row);
+        // Update seating layout function
+        function updateSeatingLayout(rows, cols) {
+            const seatingPlan = document.querySelector('.seating-plan');
+            seatingPlan.innerHTML = ''; // Clear any existing seats
 
-        for (let j = 0; j < cols; j++) {
-            const seat = document.createElement('div');
-            seat.className = 'seat';
-            seat.textContent = `${i+1}-${j+1}`; // Add seat number
-            row.appendChild(seat);
+            for (let i = 0; i < rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                seatingPlan.appendChild(row);
+
+                for (let j = 0; j < cols; j++) {
+                    const seat = document.createElement('div');
+                    seat.className = 'seat';
+                    seat.textContent = `${i+1}-${j+1}`; // Add seat number
+                    row.appendChild(seat);
+                }
+            }
+            saveState(); // Save state after updating layout
         }
-    }
-}
 
-    // Add row function
-    function addRow() {
-        const rowsInput = document.getElementById('layout-rows');
-        rowsInput.value = parseInt(rowsInput.value) + 1;
-        const rows = parseInt(rowsInput.value);
-        const cols = parseInt(document.getElementById('layout-columns').value);
-        updateSeatingLayout(rows, cols);
-    }
+        document.getElementById('add-row').addEventListener('click', addRow);
+        document.getElementById('add-column').addEventListener('click', addColumn);
 
-    // Add column function
-    function addColumn() {
-        const colsInput = document.getElementById('layout-columns');
-        colsInput.value = parseInt(colsInput.value) + 1;
-        const cols = parseInt(colsInput.value);
-        const rows = parseInt(document.getElementById('layout-rows').value);
-        updateSeatingLayout(rows, cols);
-    }
+        // Add row function
+        function addRow() {
+            const rowsInput = document.getElementById('layout-rows');
+            rowsInput.value = parseInt(rowsInput.value) + 1;
+            const rows = parseInt(rowsInput.value);
+            const cols = parseInt(document.getElementById('layout-columns').value);
+            updateSeatingLayout(rows, cols);
+        }
 
-    // Event listener for changes in number of rows
-    document.getElementById('layout-rows').addEventListener('change', function() {
-        const rows = parseInt(this.value);
-        const cols = parseInt(document.getElementById('layout-columns').value);
-        updateSeatingLayout(rows, cols);
-    });
+        // Add column function
+        function addColumn() {
+            const colsInput = document.getElementById('layout-columns');
+            colsInput.value = parseInt(colsInput.value) + 1;
+            const cols = parseInt(colsInput.value);
+            const rows = parseInt(document.getElementById('layout-rows').value);
+            updateSeatingLayout(rows, cols);
+        }
 
-    // Event listener for changes in number of columns
-    document.getElementById('layout-columns').addEventListener('change', function() {
-        const cols = parseInt(this.value);
-        const rows = parseInt(document.getElementById('layout-rows').value);
-        updateSeatingLayout(rows, cols);
-    });
-</script>
+        // Event listener for changes in number of rows
+        document.getElementById('layout-rows').addEventListener('change', function() {
+            const rows = parseInt(this.value);
+            const cols = parseInt(document.getElementById('layout-columns').value);
+            updateSeatingLayout(rows, cols);
+        });
+
+        // Event listener for changes in number of columns
+        document.getElementById('layout-columns').addEventListener('change', function() {
+            const cols = parseInt(this.value);
+            const rows = parseInt(document.getElementById('layout-rows').value);
+            updateSeatingLayout(rows, cols);
+        });
+
+        // Initial state save
+        saveState();
+
+        function attachEventListeners() {
+            // Attach event listeners to newly added elements
+            var studentList = document.getElementById('students-list');
+            var students = studentList.getElementsByClassName('student');
+            for (var i = 0; i < students.length; i++) {
+                addEditEventListener(students[i]);
+            }
+        }
+    </script>
 </body>
 </html>
