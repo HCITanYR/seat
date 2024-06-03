@@ -42,7 +42,7 @@
         .locked {
             position: relative;
         }
-        .locked:before {
+        .locked::before {
             content: '\f023';
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
@@ -51,6 +51,37 @@
             right: 5px;
             font-size: 14px;
             color: #000;
+        }
+        .warning {
+            position: relative;
+        }
+        .warning::before {
+            content: "\f071";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 14px;
+            color: red;
+        }
+        .student {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .delete-btn {
+            display: none;
+            cursor: pointer;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+        }
+
+        .student:hover .delete-btn {
+            display: inline;
         }
         
     </style>
@@ -69,7 +100,7 @@
                 <p id="error-message" style="color: red;"></p>
                 <div id="students-list" style="overflow-y: auto; flex-grow: 1; max-height: calc(100vh - 200px);">
                     <!-- Existing students go here -->
-                    <div class="student" data-preference="front">You Ren <span class="badge badge-danger">!</span></div>
+                    <div class="student warning" data-preference="front">You Ren</div>
                     <div class="student locked">Han Yang</div>
                     <div class="student">Kieran</div>
                     <!-- Add more students as needed -->
@@ -181,10 +212,18 @@
                         var newStudent = document.createElement('div');
                         newStudent.className = 'student';
                         newStudent.textContent = studentName;
+
+                        var deleteBtn = document.createElement('span');
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                        deleteBtn.addEventListener('click', function() {
+                            newStudent.remove();
+                        });
+
+                        newStudent.appendChild(deleteBtn);
                         studentList.appendChild(newStudent);
                         e.target.value = '';
                         addEditEventListener(newStudent);
-                        saveState(); // Save state after adding new student
                     }
                 }
                 e.preventDefault(); // Prevent form submission
