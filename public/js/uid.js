@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
-import { getAuth} from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -18,6 +18,7 @@ const auth = getAuth(app);
 let uid = null;
 
 export function setUid(value) {
+    console.log('setting uid to ' + value);
     uid = value;
 }
 

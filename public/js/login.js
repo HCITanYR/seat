@@ -3,7 +3,7 @@ console.log('imported this script yay');
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 import { getUid, setUid } from './uid.js';
-import { loadDesigns } from './firestore.js';
+import { loadDesigns, getDesigns } from './firestore.js';
 
 var firebaseConfig = {
     apiKey: "AIzaSyA8NyZjvci3P3_M8xFKbg-fm9ytaNpGfmE",
@@ -23,20 +23,20 @@ const user = auth.currentUser;
 
 let provider = new GoogleAuthProvider();
 
-console.log('stuff works');
-document.getElementById('login').addEventListener('click', GoogleLogin);
-document.getElementById('logout').addEventListener('click', (e) => {
-    console.log('Logging out');
-    e.preventDefault();
-    signOut(auth).then(() => {
-        console.log('logged out');
-        window.location.href = '/';
-    }
-    ).catch((error) => {
-        console.log(error);
+if (window.location.pathname.endsWith('/')){
+    document.getElementById('login').addEventListener('click', GoogleLogin);
+    document.getElementById('logout').addEventListener('click', (e) => {
+        console.log('Logging out');
+        e.preventDefault();
+        signOut(auth).then(() => {
+            console.log('logged out');
+            window.location.href = '/';
+        }
+        ).catch((error) => {
+            console.log(error);
+        });
     });
-});
-
+}
 
 function GoogleLogin() {
     console.log('Logging in');
@@ -63,17 +63,47 @@ function updateProfile(user) {
 }
 
 onAuthStateChanged(auth, (user) => {
+    loginCheck(user);
+});
+
+async function loginCheck(user){
+    console.log('auth state changed');
     if (user) {
         console.log("logged in");
-        console.log(window.location.pathname);
-        console.log("im appparently trying to hide loginpage");
-        document.getElementById("homepage").style.display = "block";
-        document.getElementById("loginpage").style.display = "none";
-        updateProfile(user)
-        loadDesigns();
+        console.log(user.uid);
+        if (window.location.pathname.endsWith('/')){
+            console.log(window.location.pathname);
+            console.log("im appparently trying to hide loginpage");
+            document.getElementById("homepage").style.display = "block";
+            document.getElementById("loginpage").style.display = "none";
+            updateProfile(user)
+            loadDesigns();
+        } else if (window.location.pathname.endsWith('/edit.html')){
+            setUid(user.uid);
+            console.log('im loading the design');
+            const urlParams = new URLSearchParams(window.location.search);
+            const design = urlParams.get('d');
+            if (design) {
+                // Load design
+                try {
+                    let designs = await getDesigns();
+                    const designData = designs['designs'][design];
+                    console.log(designData);
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                window.location.href = '/';
+            }
+        }
     } else {
         console.log("not logged in");
-        document.getElementById("homepage").style.display = "none";
-        document.getElementById("loginpage").style.display = "block";
+        if (window.location.pathname.endsWith('/')) {
+            
+            document.getElementById("homepage").style.display = "none";
+            document.getElementById("loginpage").style.display = "block";
+        } else {
+            window.location.href = '../';
+        }
     }
-});
+}

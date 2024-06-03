@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
-    <script src="js/firestore.js" type="module"></script>
+    <script type="module">
+        import { add } from './js/firestore.js';
+    
+        document.getElementById('create').addEventListener('click', () => add('new', []));
+    </script>
     <script src="js/login.js" type="module"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -76,12 +80,6 @@
             <h2>Welcome back, <span id="user-name">Guest</span>!</h2>
             <h3 class="mt-4">Recent designs</h3>
             <div class="row" id="designRow">
-                <div class="col-md-3">
-                    <div class="design-card hover-darken">
-                        <img src="https://via.placeholder.com/150" alt="Auditorium">
-                        <p>Terraces CSM</p>
-                    </div>
-                </div>
             </div>
             <h3 class="mt-4">Or, curate a new design:</h3>
             <div class="row">
@@ -106,13 +104,17 @@
             </div>
         </div>
     </div>
-
     <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <!-- Firebase configuration and initialization -->
-    
+    <script>
+        console.log(window.location.pathname);
+        if (window.location.pathname.endsWith('index.html')) {
+            window.location.href = '../';
+        }
+    </script>
 </body>
 </html>

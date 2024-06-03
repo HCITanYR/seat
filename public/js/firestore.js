@@ -16,8 +16,6 @@ const app = initializeApp(firebaseConfig);
 const firestore  = initializeFirestore(app, { cacheSizeBytes: CACHE_SIZE_UNLIMITED });
 
 
-document.getElementById('create').addEventListener('click', () => add('new', []));
-
 async function setup(){
     const designsRef = collection(firestore, 'designs');
     const docRef = doc(designsRef, getUid());
@@ -33,7 +31,7 @@ async function setup(){
     }
 }
 
-async function add(name, data){
+export async function add(name, data){
     await setup();
     const designsRef = collection(firestore, 'designs');
     const docRef = doc(designsRef, getUid());
@@ -52,7 +50,8 @@ async function add(name, data){
     }
 }
 
-async function getDesigns(){
+export async function getDesigns(){
+    console.log('uid: ' + getUid());
     await setup();
     const designsRef = collection(firestore, 'designs');
     const docRef = doc(designsRef, getUid());
@@ -64,7 +63,7 @@ async function getDesigns(){
     }
 }
 
-function addDesignCard(name){
+function addDesignCard(name, index){
     const col = document.createElement('div');
     col.className = 'col-md-3';
     const card = document.createElement('div');
@@ -76,14 +75,18 @@ function addDesignCard(name){
     card.appendChild(image);
     card.appendChild(para);
     col.appendChild(card);
+    col.addEventListener('click', () => {
+        window.location.href = 'edit.html?d=' + index;
+    });
     document.getElementById('designRow').appendChild(col);
 }
 
 export async function loadDesigns() {
     console.log('im trying to load designs');
     await getDesigns().then(data => {
-        data.designs.forEach(design => {
-            addDesignCard(design.name);
+        data.designs.sort((a, b) => b.lastModified - a.lastModified);
+        data.designs.forEach((design, index) => {
+            addDesignCard(design.name, index);
         });
     });
 }
