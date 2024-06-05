@@ -84,6 +84,15 @@
             display: inline;
         }
         
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #csv-table td.selected {
+            background-color: #d1e7dd; /* Light green background for selected cells */
+        }
+
     </style>
 </head>
 <body>
@@ -94,7 +103,37 @@
                 <!-- Student list -->
                 <div class="d-flex justify-content-between align-items-center">
                     <h2>Students</h2>
-                    <button class="btn btn-outline-secondary">Import from CSV</button>
+                    <!-- Import from CSV button -->
+                    <button id="import-btn" class="btn btn-outline-secondary">Import from CSV</button>
+                    <input type="file" id="csv-file" accept=".csv,.xls,.xlsx" style="display:none;">
+
+                <!-- Modal for table editor -->
+                <div class="modal fade" id="table-editor-modal" tabindex="-1" role="dialog" aria-labelledby="tableEditorModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="tableEditorModalLabel">Table Editor</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex justify-content-end mb-2">
+                                    <button id="table-undo" class="btn btn-outline-secondary mr-2">Undo</button>
+                                    <button id="table-redo" class="btn btn-outline-secondary">Redo</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="csv-table" class="table table-bordered">
+                                        <!-- CSV content will be dynamically inserted here -->
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="finish-import" class="btn btn-primary">Finish</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
                 <input type="text" id="new-student" placeholder="Enter new student's name" style="width: 100%;">
                 <p id="error-message" style="color: red;"></p>
@@ -363,6 +402,170 @@
                 addEditEventListener(students[i]);
             }
         }
+
+        document.getElementById('import-btn').addEventListener('click', function() {
+            document.getElementById('csv-file').click();
+        });
+
+        document.getElementById('csv-file').addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contents = e.target.result;
+                    parseCSV(contents);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function parseCSV(contents) {
+            const rows = contents.split('\n').map(row => row.split(','));
+            const table = document.getElementById('csv-table');
+            table.innerHTML = ''; // Clear previous content
+
+            rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    td.addEventListener('click', () => {
+                        td.classList.toggle('selected');
+                    });
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+
+            $('#table-editor-modal').modal('show');
+        }
+        document.getElementById('import-btn').addEventListener('click', function() {
+            document.getElementById('csv-file').click();
+        });
+
+        document.getElementById('csv-file').addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contents = e.target.result;
+                    parseCSV(contents);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function parseCSV(contents) {
+            const rows = contents.split('\n').map(row => row.split(','));
+            const table = document.getElementById('csv-table');
+            table.innerHTML = ''; // Clear previous content
+
+            rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    td.addEventListener('click', () => {
+                        td.classList.toggle('selected');
+                    });
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+
+            $('#table-editor-modal').modal('show');
+        }
+
+        let tableHistory = [];
+        let tableRedoStack = [];
+        const maxTableHistory = 25;
+
+        function saveTableState() {
+            const table = document.getElementById('csv-table');
+            const tableHTML = table.innerHTML;
+            if (tableHistory.length >= maxTableHistory) {
+                tableHistory.shift();
+            }
+            tableHistory.push(tableHTML);
+            tableRedoStack = []; // Clear redo stack on new action
+        }
+
+        function applyTableState(state) {
+            const table = document.getElementById('csv-table');
+            table.innerHTML = state;
+            attachTableCellEventListeners();
+        }
+
+        function tableUndo() {
+            if (tableHistory.length > 1) {
+                const currentState = tableHistory.pop();
+                tableRedoStack.push(currentState);
+                applyTableState(tableHistory[tableHistory.length - 1]);
+            }
+        }
+
+        function tableRedo() {
+            if (tableRedoStack.length > 0) {
+                const nextState = tableRedoStack.pop();
+                tableHistory.push(nextState);
+                applyTableState(nextState);
+            }
+        }
+
+        document.getElementById('table-undo').addEventListener('click', tableUndo);
+        document.getElementById('table-redo').addEventListener('click', tableRedo);
+
+        function attachTableCellEventListeners() {
+            const tableCells = document.querySelectorAll('#csv-table td');
+            tableCells.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    cell.classList.toggle('selected');
+                    saveTableState(); // Save state on cell selection
+                });
+            });
+        }
+
+        function parseCSV(contents) {
+            const rows = contents.split('\n').map(row => row.split(','));
+            const table = document.getElementById('csv-table');
+            table.innerHTML = ''; // Clear previous content
+
+            rows.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+
+            saveTableState(); // Save initial state
+            attachTableCellEventListeners(); // Attach event listeners after table creation
+
+            $('#table-editor-modal').modal('show');
+        }
+
+        document.getElementById('finish-import').addEventListener('click', function() {
+            const selectedCells = document.querySelectorAll('#csv-table td.selected');
+            const studentList = document.getElementById('students-list');
+
+            selectedCells.forEach(cell => {
+                const newStudent = document.createElement('div');
+                newStudent.className = 'student';
+                newStudent.textContent = cell.textContent.trim();
+                studentList.appendChild(newStudent);
+                addEditEventListener(newStudent);
+            });
+
+            $('#table-editor-modal').modal('hide');
+            saveState(); // Save state after importing students to link with main undo/redo
+        });
+
     </script>
 </body>
 </html>
