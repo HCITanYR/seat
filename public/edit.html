@@ -281,6 +281,7 @@
 
         // Adding delete button to student
         function addDeleteButton(student) {
+            console.log('adding delete button');
             var deleteBtn = document.createElement('span');
             deleteBtn.className = 'delete-btn';
             deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
@@ -303,6 +304,7 @@
                 input.focus();
 
                 function handleInput(e) {
+                    console.log('editing name');
                     var newName = e.target.value.trim();
                     if (newName && newName !== originalName) {
                         e.target.parentElement.textContent = newName;
@@ -310,6 +312,7 @@
                     } else {
                         e.target.parentElement.textContent = originalName;
                     }
+                    addDeleteButton(student); // re-add delete button after editing
                 }
 
                 input.addEventListener('blur', handleInput);
