@@ -172,11 +172,7 @@ function addColumn() {
     updateSeatingPlan();
 }
 
-
-// update seating plan
-document.getElementById('layout-rows').addEventListener('change', updateSeatingPlan);
-document.getElementById('layout-columns').addEventListener('change', updateSeatingPlan);
-
+// Update seating plan
 function updateSeatingPlan() {
     const seatingPlanContainer = document.getElementById('seating-plan');
     const rows = parseInt(document.getElementById('layout-rows').value); // Number of rows
