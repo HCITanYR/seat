@@ -1,5 +1,11 @@
- // Zoom in and zoom out functionality
- let zoomLevel = 1;
+// Initialise page on load
+document.addEventListener('DOMContentLoaded', () => {
+    updateSeatingPlan();
+    addDragListeners();
+});
+
+// Zoom in and zoom out functionality
+let zoomLevel = 1;
 
 //draggable background
 const detect = document.getElementById('zoomable-content');
@@ -9,6 +15,67 @@ const maxX = 500; // Set your maximum X
 const minY = -500; // Set your minimum Y
 const maxY = 500;
 // TODO: need to calculate this
+
+// drag with trackpad
+// Function to add drag event listeners
+function addDragListeners() {
+    const seatingPlanContainer = document.getElementById('seating-plan');
+    seatingPlanContainer.addEventListener('mouseenter', () => {
+        seatingPlanContainer.addEventListener('mouseenter', startDrag);
+    });
+    seatingPlanContainer.addEventListener('mouseleave', () => {
+        seatingPlanContainer.removeEventListener('mousedown', startDrag);
+    });
+}
+
+// Function to start dragging
+function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    detect.style.cursor = 'grabbing';
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+}
+
+// Function to perform dragging
+function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    let x = e.clientX - startX;
+    let y = e.clientY - startY;
+    initialPosX += x;
+    initialPosY += y;
+
+    // Check boundaries
+    if (initialPosX > maxX) {
+        initialPosX = maxX;
+    }
+    if (initialPosX < minX) {
+        initialPosX = minX;
+    }
+    if (initialPosY > maxY) {
+        initialPosY = maxY;
+    }
+    if (initialPosY < minY) {
+        initialPosY = minY;
+    }
+
+    document.getElementById('seating-plan').style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
+    startX = e.clientX;
+    startY = e.clientY;
+}
+
+// Function to end dragging
+function endDrag() {
+    isDragging = false;
+    detect.style.cursor = 'grab';
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', endDrag);
+}
+
 
 let isDragging = false;
 let startX, startY, initialPosX = 0, initialPosY = 0;
@@ -119,35 +186,51 @@ document.getElementById('zoom-out').addEventListener('click', function() {
  document.getElementById('undo-btn').addEventListener('click', undo);
  document.getElementById('redo-btn').addEventListener('click', redo);
 
- // Add a new row
- document.getElementById('add-row').addEventListener('click', function() {
-     const seatingPlan = document.getElementById('seating-plan');
-     const rows = seatingPlan.querySelectorAll('.row').length;
-     const cols = seatingPlan.querySelector('.row')?.children.length || 0;
-     const newRow = document.createElement('div');
-     newRow.className = 'row';
-     for (let i = 0; i < cols; i++) {
-         const newSeat = document.createElement('div');
-         newSeat.className = 'seat';
-         newSeat.dataset.seat = `${rows + 1}${String.fromCharCode(97 + i)}`;
-         newRow.appendChild(newSeat);
-     }
-     seatingPlan.appendChild(newRow);
-     saveState(); // Save state after adding a row
- });
+// Add a new row
+function addRow() {
+    const rowsInput = document.getElementById('layout-rows');
+    rowsInput.value = parseInt(rowsInput.value) + 1;
+    updateSeatingPlan();
+}
+document.getElementById('add-row').addEventListener('click', addRow);
 
- // Add a new column
- document.getElementById('add-column').addEventListener('click', function() {
-     const seatingPlan = document.getElementById('seating-plan');
-     const rows = seatingPlan.querySelectorAll('.row');
-     rows.forEach((row, rowIndex) => {
-         const newSeat = document.createElement('div');
-         newSeat.className = 'seat';
-         newSeat.dataset.seat = `${rowIndex + 1}${String.fromCharCode(97 + row.children.length)}`;
-         row.appendChild(newSeat);
-     });
-     saveState(); // Save state after adding a column
- });
+// Add a new column
+function addColumn() {
+    const columnsInput = document.getElementById('layout-columns');
+    columnsInput.value = parseInt(columnsInput.value) + 1;
+    updateSeatingPlan();
+}
+document.getElementById('add-column').addEventListener('click', addColumn);
+
+
+// update seating plan
+document.getElementById('layout-rows').addEventListener('change', updateSeatingPlan);
+document.getElementById('layout-columns').addEventListener('change', updateSeatingPlan);
+
+function updateSeatingPlan() {
+    const seatingPlanContainer = document.getElementById('seating-plan');
+    const rows = parseInt(document.getElementById('layout-rows').value); // Number of rows
+    const columns = parseInt(document.getElementById('layout-columns').value); // Number of columns
+
+    // Clear the existing seating plan
+    seatingPlanContainer.innerHTML = '';
+
+    // Generate new seating plan based on rows and columns input
+    for (let row = 0; row < rows; row++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row');
+        for (let col = 0; col < columns; col++) {
+            const seatDiv = document.createElement('div');
+            seatDiv.classList.add('seat');
+            seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
+            seatDiv.innerText = `${row + 1}${String.fromCharCode(65 + col)}`; // Display seat as 1A, 1B, etc.
+            rowDiv.appendChild(seatDiv);
+        }
+        seatingPlanContainer.appendChild(rowDiv);
+    }
+
+    saveState(); // Save the new seating plan state
+}
 
 
  // Adding delete button to student

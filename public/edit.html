@@ -161,9 +161,9 @@
                         <div class="d-flex justify-content-start mb-2">
                             <div class="mr-2">
                                 <label for="layout-rows">Layout: </label>
-                                <input type="number" id="layout-rows" value="2" min="1" max="10">
+                                <input type="number" id="layout-columns" value="2" min="1" max="10" onchange="updateSeatingPlan()">
                                 by
-                                <input type="number" id="layout-columns" value="2" min="1" max="10">
+                                <input type="number" id="layout-rows" value="2" min="1" max="10" onchange="updateSeatingPlan()">
                             </div>
                             <div class="ml-auto">
                                 <button class="btn btn-outline-secondary mr-2" id="undo-btn">Undo</button>
@@ -172,16 +172,13 @@
                         </div>
                         <!-- Seating plan layout -->
                         <div id="zoomable-content" class="bg-info flex-grow-1 d-flex justify-content-center align-items-center">
-                            <div class="seating-plan flex-grow-1 d-flex" id="seating-plan">
-                                <!-- <div class="seat" data-seat="1a">You Ren</div>
-                                <div class="seat locked" data-seat="1b">Han Yang</div>
-                                <div class="seat" data-seat="2a">Kieran</div>
-                                <div class="seat" data-seat="2b">Ming Xuan</div> -->
+                            <div class="seating-plan flex-grow-1 d-flex flex-wrap" id="seating-plan">
+                                <!-- Seat elements will be dynamically inserted here -->
                             </div>
                         </div>
                         <div class="d-flex justify-content-center mt-4">
-                            <button class="btn btn-outline-primary m-2" id="add-row">Add row</button>
-                            <button class="btn btn-outline-primary m-2" id="add-column">Add column</button>
+                            <button class="btn btn-outline-primary m-2" id="add-row" onclick="addRow()">Add row</button>
+                            <button class="btn btn-outline-primary m-2" id="add-column" onclick="addColumn()">Add column</button>
                             <button id="zoom-in" class="btn btn-outline-secondary m-2"><i class="fas fa-search-plus"></i></button>
                             <button id="zoom-out" class="btn btn-outline-secondary m-2"><i class="fas fa-search-minus"></i></button>
                         </div>
