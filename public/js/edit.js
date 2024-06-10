@@ -188,6 +188,7 @@ function updateSeatingPlan() {
         for (let col = 0; col < columns; col++) {
             const seatDiv = document.createElement('div');
             seatDiv.classList.add('seat');
+            seatDiv.classList.add('unselectable');
             seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
             seatDiv.innerText = `${row + 1}${String.fromCharCode(65 + col)}`; // Display seat as 1A, 1B, etc.
             rowDiv.appendChild(seatDiv);

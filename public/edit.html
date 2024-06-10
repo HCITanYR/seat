@@ -7,102 +7,7 @@
     <script src="js/login.js" type="module"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #ffffff;
-        }
-        .seating-plan {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-        #zoomable-content {
-            height: 300px;
-            overflow: hidden;
-            cursor: move;
-        }
-        .row {
-            display: flex;
-            justify-content: center;
-        }
-
-        .seat {
-            width: 100px;
-            height: 100px;
-            background-color: #d2a679;
-            margin: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            color: #000;
-        }
-        .locked {
-            position: relative;
-        }
-        .locked::before {
-            content: '\f023';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 14px;
-            color: #000;
-        }
-        .warning {
-            position: relative;
-        }
-        .warning::before {
-            content: "\f071";
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 14px;
-            color: red;
-        }
-        .student {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .delete-btn {
-            display: none;
-            cursor: pointer;
-            position: absolute;
-            right: 5px;
-            top: 5px;
-        }
-
-        .student:hover .delete-btn {
-            display: inline;
-        }
-        
-        .table-responsive {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        #csv-table td.selected {
-            background-color: #d1e7dd; /* Light green background for selected cells */
-        }
-        .unselectable {
-            user-select: none;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-        }
-
-    </style>
+    <link rel="stylesheet" href="css/edit.css">
 </head>
 <body>
     <div class="container-fluid p-4 d-flex flex-column" style="height: 100vh;">
@@ -161,9 +66,9 @@
                         <div class="d-flex justify-content-start mb-2">
                             <div class="mr-2">
                                 <label for="layout-rows">Layout: </label>
-                                <input type="number" id="layout-columns" value="2" min="1" max="10" onchange="updateSeatingPlan()">
+                                <input type="number" id="layout-columns" value="2" min="1" max="50" onchange="updateSeatingPlan()">
                                 by
-                                <input type="number" id="layout-rows" value="2" min="1" max="10" onchange="updateSeatingPlan()">
+                                <input type="number" id="layout-rows" value="2" min="1" max="50" onchange="updateSeatingPlan()">
                             </div>
                             <div class="ml-auto">
                                 <button class="btn btn-outline-secondary mr-2" id="undo-btn">Undo</button>
@@ -171,8 +76,8 @@
                             </div>
                         </div>
                         <!-- Seating plan layout -->
-                        <div id="zoomable-content" class="bg-info flex-grow-1 d-flex justify-content-center align-items-center">
-                            <div class="seating-plan flex-grow-1 d-flex flex-wrap" id="seating-plan">
+                        <div id="zoomable-content" class="bg-info">
+                            <div class="seating-plan flex-grow-1 d-flex" id="seating-plan">
                                 <!-- Seat elements will be dynamically inserted here -->
                             </div>
                         </div>
