@@ -190,7 +190,7 @@ function updateSeatingPlan() {
             seatDiv.classList.add('seat');
             seatDiv.classList.add('unselectable');
             seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
-            seatDiv.innerText = `${row + 1}${String.fromCharCode(65 + col)}`; // Display seat as 1A, 1B, etc.
+            seatDiv.innerText = ``;
             rowDiv.appendChild(seatDiv);
         }
         seatingPlanContainer.appendChild(rowDiv);
@@ -215,34 +215,35 @@ function addDeleteButton(student) {
 
 // Add event listener for editing names
 function addEditEventListener(student) {
-     // Make students draggable
+    // Make students draggable
     student.draggable = true;
     student.addEventListener('dragstart', dragStart);
 
-     function dragStart(e) {
-         e.dataTransfer.setData('text/plain', e.target.innerText);
-         e.dataTransfer.effectAllowed = 'move';
-     }
+    function dragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.innerText);
+        e.dataTransfer.effectAllowed = 'move';
+    }
 
-     // Make seating plan droppable
-     const seatingPlan = document.getElementById('seating-plan');
-     seatingPlan.addEventListener('dragover', dragOver);
-     seatingPlan.addEventListener('drop', drop);
+    // Make seating plan droppable
+    const seatingPlan = document.getElementById('seating-plan');
+    seatingPlan.addEventListener('dragover', dragOver);
+    seatingPlan.addEventListener('drop', drop);
 
-     function dragOver(e) {
-         e.preventDefault();
-         e.dataTransfer.dropEffect = 'move';
-     }
+    function dragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
 
-     function drop(e) {
-         e.preventDefault();
-         const studentName = e.dataTransfer.getData('text/plain');
-         const targetSeat = e.target;
-         
-         if (targetSeat.classList.contains('seat')) {
-             targetSeat.innerText = studentName;
-         }
-     }
+    function drop(e) {
+        e.preventDefault();
+        const studentName = e.dataTransfer.getData('text/plain');
+        const targetSeat = e.target;
+
+        if (targetSeat.classList.contains('seat')) {
+            targetSeat.innerText = studentName;
+            targetSeat.classList.add('occupied'); // Add class for occupied seats
+        }
+    }
 
     student.addEventListener('click', function (e) {
         var originalName = e.target.textContent.trim();
@@ -256,9 +257,21 @@ function addEditEventListener(student) {
         function handleInput(e) {
             console.log('editing name');
             var newName = e.target.value.trim();
+
             if (newName && newName !== originalName) {
-                e.target.parentElement.textContent = newName;
-                saveState(); // Save state after editing a student name
+                // Check for duplicates
+                var studentList = document.getElementById('students-list');
+                var students = Array.from(studentList.getElementsByClassName('student'));
+                var names = students.map(student => student.textContent);
+
+                if (names.includes(newName)) {
+                    // Show the error modal
+                    $('#errorModal').modal('show');
+                    e.target.parentElement.textContent = originalName; // Revert to the original name
+                } else {
+                    e.target.parentElement.textContent = newName;
+                    saveState(); // Save state after editing a student name
+                }
             } else {
                 e.target.parentElement.textContent = originalName;
             }

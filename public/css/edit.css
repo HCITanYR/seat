@@ -24,7 +24,6 @@
         .seat {
             width: 100px;
             height: 100px;
-            background-color: #d2a679;
             margin: 10px;
             display: flex;
             justify-content: center;
@@ -34,6 +33,13 @@
             font-size: 16px;
             color: #000;
             flex-shrink: 0;
+            background-color: #ccc;
+            /* Default background color for empty seats */
+        }
+
+        .seat.occupied {
+            background-color: #d2a679;
+            /* Background color for occupied seats */
         }
         .locked {
             position: relative;
