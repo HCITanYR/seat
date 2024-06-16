@@ -21,42 +21,37 @@
                     <button id="import-btn" class="btn btn-outline-secondary">Import from CSV</button>
                     <input type="file" id="csv-file" accept=".csv,.xls,.xlsx" style="display:none;">
 
-                <!-- Modal for table editor -->
-                <div class="modal fade" id="table-editor-modal" tabindex="-1" role="dialog" aria-labelledby="tableEditorModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="tableEditorModalLabel">Table Editor</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="d-flex justify-content-end mb-2">
-                                    <button id="table-undo" class="btn btn-outline-secondary mr-2">Undo</button>
-                                    <button id="table-redo" class="btn btn-outline-secondary">Redo</button>
+                    <!-- Modal for table editor -->
+                    <div class="modal fade" id="table-editor-modal" tabindex="-1" role="dialog" aria-labelledby="tableEditorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="tableEditorModalLabel">Table Editor</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
-                                <div class="table-responsive">
-                                    <table id="csv-table" class="table table-bordered">
-                                        <!-- CSV content will be dynamically inserted here -->
-                                    </table>
+                                <div class="modal-body">
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <button id="table-undo" class="btn btn-outline-secondary mr-2">Undo</button>
+                                        <button id="table-redo" class="btn btn-outline-secondary">Redo</button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table id="csv-table" class="table table-bordered">
+                                            <!-- CSV content will be dynamically inserted here -->
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" id="finish-import" class="btn btn-primary">Finish</button>
+                                <div class="modal-footer">
+                                    <button type="button" id="finish-import" class="btn btn-primary">Finish</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
                 <input type="text" id="new-student" placeholder="Enter new student's name" style="width: 100%;">
                 <p id="error-message" style="color: red;"></p>
                 <div id="students-list" style="overflow-y: auto; flex-grow: 1; max-height: calc(100vh - 200px);">
-                    <!-- Existing students go here -->
-                    <!-- <div class="student warning" data-preference="front">You Ren</div>
-                    <div class="student locked">Han Yang</div>
-                    <div class="student">Kieran</div> -->
-                    <!-- Add more students as needed -->
                 </div>
             </div>
 

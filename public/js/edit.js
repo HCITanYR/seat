@@ -215,6 +215,35 @@ function addDeleteButton(student) {
 
 // Add event listener for editing names
 function addEditEventListener(student) {
+     // Make students draggable
+    student.draggable = true;
+    student.addEventListener('dragstart', dragStart);
+
+     function dragStart(e) {
+         e.dataTransfer.setData('text/plain', e.target.innerText);
+         e.dataTransfer.effectAllowed = 'move';
+     }
+
+     // Make seating plan droppable
+     const seatingPlan = document.getElementById('seating-plan');
+     seatingPlan.addEventListener('dragover', dragOver);
+     seatingPlan.addEventListener('drop', drop);
+
+     function dragOver(e) {
+         e.preventDefault();
+         e.dataTransfer.dropEffect = 'move';
+     }
+
+     function drop(e) {
+         e.preventDefault();
+         const studentName = e.dataTransfer.getData('text/plain');
+         const targetSeat = e.target;
+         
+         if (targetSeat.classList.contains('seat')) {
+             targetSeat.innerText = studentName;
+         }
+     }
+
     student.addEventListener('click', function (e) {
         var originalName = e.target.textContent.trim();
         var input = document.createElement('input');
