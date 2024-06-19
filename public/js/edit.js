@@ -3,6 +3,103 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSeatingPlan();
 });
 
+function updateDraggableSeats() {
+    // make the seats draggable AND droppable
+    const allSeats = document.querySelectorAll('.seat');
+    allSeats.forEach(seat => {
+        seat.draggable = false; // default state
+        if (seat.classList.contains('occupied')) {
+            // can drag if seat is not empty
+            seat.draggable = true;
+            seat.addEventListener('dragstart', seatDragStart);
+            seat.addEventListener('dragend', seatDragEnd);
+        }
+        seat.addEventListener('dragover', seatDragOver);
+        seat.addEventListener('drop', seatDrop);
+        seat.addEventListener('dragleave', seatDragLeave);
+    });
+}
+
+function seatDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.innerText);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // highlight the seat being dragged
+    e.target.classList.add('dragging');
+}
+
+function seatDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move'; // indicate a move operation
+
+    if (e.target.classList.contains('seat') && !e.target.classList.contains('dragging')) {
+        e.target.classList.add('over');
+    }
+}
+
+function seatDragLeave(e) {
+    if (e.target.classList.contains('seat')) {
+        e.target.classList.remove('over');
+    }
+}
+
+function seatDrop(e) {
+    e.preventDefault();
+    const studentName = e.dataTransfer.getData('text/plain');
+    const targetSeat = e.target;
+
+    // remove the 'over' class first
+    targetSeat.classList.remove('over');
+
+    // remove the 'dragging' class from the previously selected seat
+    const previousSeat = document.querySelector('.dragging');
+    if (previousSeat) {
+        previousSeat.classList.remove('dragging');
+    }
+
+    // find if the student is already seated elsewhere
+    const allSeats = document.querySelectorAll('.seat');
+    let existingSeat = null;
+    allSeats.forEach(seat => {
+        if (seat.innerText === studentName && seat !== targetSeat) {
+            existingSeat = seat;
+        }
+    });
+
+    if (targetSeat.classList.contains('unoccupied')) {
+        // if empty seat
+        if (existingSeat) {
+            // if the student is already occupying another seat
+            existingSeat.innerText = ''; // clear the student's name from the old seat
+            existingSeat.classList.remove('occupied');
+            existingSeat.classList.add('unoccupied'); // mark the old seat as unoccupied
+        }
+        // move the student to the new target seat
+        targetSeat.innerText = studentName; // set the student's name to the new seat
+        targetSeat.classList.remove('unoccupied');
+        targetSeat.classList.add('occupied'); // mark the new seat as occupied
+        saveState();
+    } else if (targetSeat.classList.contains('occupied')) {
+        // target seat already occupied
+        if (targetSeat.innerText == studentName) {
+            return; // do nothing if same student is dropped
+        } else {
+            // occupied seat is a student of a different name
+            if (existingSeat) {
+                // if the student is already occupying another seat
+                existingSeat.innerText = targetSeat.innerText; // swap the existing seat with target
+            }
+            targetSeat.innerText = studentName; // replace target
+            saveState();
+        }
+    }
+}
+
+function seatDragEnd(e) {
+    // remove the 'dragging' class from the seat
+    e.target.classList.remove('dragging');
+}
+
 // Zoom in and zoom out functionality
 let zoomLevel = 1;
 
@@ -95,6 +192,8 @@ function saveState() {
     } else {
         historyIndex++;
     }
+
+    updateDraggableSeats();
 }
 
 function applyState(state) {
@@ -109,6 +208,7 @@ function undo() {
     if (historyIndex > 0) {
         historyIndex--;
         applyState(history[historyIndex]);
+        updateDraggableSeats();
     }
 }
 
@@ -116,6 +216,7 @@ function redo() {
     if (historyIndex < history.length - 1) {
         historyIndex++;
         applyState(history[historyIndex]);
+        updateDraggableSeats();
     }
 }
 
@@ -190,7 +291,19 @@ function addDeleteButton(student) {
     deleteBtn.className = 'delete-btn';
     deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
     deleteBtn.addEventListener('click', function () {
-        student.remove();
+        student.remove(); // remove student from list
+
+        studentName = student.innerText;
+        // find if the student is already seated 
+        const allSeats = document.querySelectorAll('.seat');
+        allSeats.forEach(seat => {
+            if (seat.innerText === studentName) {
+                seat.innerText = ''; // clear the student's name from the old seat
+                seat.classList.remove('occupied');
+                seat.classList.add('unoccupied'); // mark the old seat as unoccupied
+            }
+        });
+
         saveState(); // Save state after deleting a student
     });
     student.appendChild(deleteBtn);
@@ -205,43 +318,6 @@ function addEditEventListener(student) {
     function dragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.innerText);
         e.dataTransfer.effectAllowed = 'move';
-    }
-
-    // Make seating plan droppable
-    const seatingPlan = document.getElementById('seating-plan');
-    seatingPlan.addEventListener('dragover', dragOver);
-    seatingPlan.addEventListener('drop', drop);
-
-    function dragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    function drop(e) {
-        e.preventDefault();
-        const studentName = e.dataTransfer.getData('text/plain');
-        const targetSeat = e.target;
-
-        if (targetSeat.classList.contains('unoccupied')) { // if empty seat
-            targetSeat.innerText = studentName;
-            seatDiv.classList.remove('unoccupied');
-            targetSeat.classList.add('occupied'); // swaps status
-        } else if (targetSeat.classList.contains('occupied')) { // already occupied
-            if (targetSeat.innerText == studentName) {
-                return; // do nothing if same student is dropped
-            } else {
-                // to swap seats
-                const swappedName = targetSeat.innerText
-                const allSeats = document.querySelectorAll('.seat');
-                allSeats.forEach(seat => {
-                    if (seat.innerText == studentName && seat !== targetSeat) {
-                        seat.innerText = swappedName; // place the swapped name in the old seat
-                    }
-                });
-            }
-
-                targetSeat.innerText = studentName; // replace target
-            }
     }
 
     student.addEventListener('click', function (e) {

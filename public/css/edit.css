@@ -44,6 +44,19 @@
             background-color: #d2a679;
             /* Background color for occupied seats */
         }
+
+        /* Visual feedback while a seat is being dragged */
+        .dragging {
+            opacity: 0.5;
+            /* Make the seat semi-transparent */
+        }
+
+        /* Visual feedback for a valid drop target */
+        .over {
+            border: 2px dashed grey;
+            /* Add a dashed border to indicate a valid drop target */
+        }
+
         .locked {
             position: relative;
         }
