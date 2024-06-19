@@ -1,6 +1,32 @@
+var name = '';
+var history = [];
+let historyIndex = -1;
+const urlParams = new URLSearchParams(window.location.search);
+const design = urlParams.get('d');
+var designs = null;
+var rows = 2;
+var columns = 2;
+
+import { getDesigns, update } from "./firestore.js";
+import { getUid } from "./uid.js";
+
 // Initialise page on load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    while (getUid() === null) {
+        await new Promise(resolve => setTimeout(resolve));
+    }
+    designs = await getDesigns();
+    var designweusing = designs['designs'][design];
+    name = designweusing['name'];
+    historyIndex = designweusing['histindex'];
+    document.getElementById('designtitle').innerHTML = name;
+    for (const item of designweusing['data']) {
+        history.push(item);
+    }
+    rows = history[historyIndex].rows;
+    columns = history[historyIndex].cols;
     updateSeatingPlan();
+    document.getElementById('editpage').style.display = 'block';
 });
 
 function updateDraggableSeats() {
@@ -173,35 +199,37 @@ document.getElementById('zoom-out').addEventListener('click', function () {
 });
 
 // History state management
-const history = [];
-let historyIndex = -1;
+
 
 function saveState() {
+    console.log('saving state');
     const state = {
         students: document.getElementById('students-list').innerHTML,
         seatingPlan: document.getElementById('seating-plan').innerHTML,
-        rows: document.getElementById('layout-rows').value,
-        cols: document.getElementById('layout-columns').value
+        rows: rows,
+        cols: columns,
     };
     if (historyIndex < history.length - 1) {
         history.splice(historyIndex + 1);
     }
     history.push(state);
-    if (history.length > 25) {
+    if (history.length > 255) {
         history.shift();
     } else {
         historyIndex++;
     }
-
     updateDraggableSeats();
+    update(design, name, history, designs, historyIndex);
 }
 
 function applyState(state) {
-    document.getElementById('students-list').innerHTML = state.students;
-    document.getElementById('seating-plan').innerHTML = state.seatingPlan;
-    document.getElementById('layout-rows').value = state.rows;
-    document.getElementById('layout-columns').value = state.cols;
-    attachEventListeners();
+    if (state > -1) {
+        document.getElementById('students-list').innerHTML = state.students;
+        document.getElementById('seating-plan').innerHTML = state.seatingPlan;
+        document.getElementById('layout-rows').value = state.rows;
+        document.getElementById('layout-columns').value = state.cols;
+        attachEventListeners();
+    }
 }
 
 function undo() {
@@ -242,25 +270,32 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
+document.getElementById('add-row').addEventListener('click', addRow);
+
+document.getElementById('add-column').addEventListener('click', addColumn);
 // Add a new row
 function addRow() {
     const rowsInput = document.getElementById('layout-rows');
     rowsInput.value = parseInt(rowsInput.value) + 1;
+    rows += 1;
     updateSeatingPlan();
+    
+    saveState(); // Save the new seating plan state
 }
 
 // Add a new column
 function addColumn() {
     const columnsInput = document.getElementById('layout-columns');
     columnsInput.value = parseInt(columnsInput.value) + 1;
+    columns += 1;
     updateSeatingPlan();
+    
+    saveState(); // Save the new seating plan state
 }
 
-// Update seating plan
+//   seating plan
 function updateSeatingPlan() {
-    const seatingPlanContainer = document.getElementById('seating-plan');
-    const rows = parseInt(document.getElementById('layout-rows').value); // Number of rows
-    const columns = parseInt(document.getElementById('layout-columns').value); // Number of columns
+    const seatingPlanContainer = document.getElementById('seating-plan'); // Number of columns
 
     // Clear the existing seating plan
     seatingPlanContainer.innerHTML = '';
@@ -279,8 +314,6 @@ function updateSeatingPlan() {
         }
         seatingPlanContainer.appendChild(rowDiv);
     }
-
-    saveState(); // Save the new seating plan state
 }
 
 
@@ -378,12 +411,14 @@ document.getElementById('new-student').addEventListener('keypress', function (e)
                 errorMessage.textContent = 'Error: Student name already exists!';
             } else {
                 var newStudent = document.createElement('div');
+                var name = document.createElement('span');
+                name.textContent = studentName;
                 newStudent.className = 'student';
-                newStudent.textContent = studentName;
+                newStudent.appendChild(name);
                 addDeleteButton(newStudent); // Add delete button to new student
                 studentList.appendChild(newStudent);
                 e.target.value = '';
-                addEditEventListener(newStudent);
+                addEditEventListener(name);
                 saveState(); // Save state after adding a student
             }
         }

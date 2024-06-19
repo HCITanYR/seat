@@ -12,7 +12,7 @@
         #zoomable-content {
             overflow: hidden;
             cursor: move;
-            height: 600px;
+            height: 500px;
         }
         .row {
             display: flex;

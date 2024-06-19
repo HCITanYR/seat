@@ -1,4 +1,6 @@
-console.log('imported this script yay');
+var designName = '';
+var designData = null;
+
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
@@ -29,7 +31,6 @@ if (window.location.pathname.endsWith('/')){
         console.log('Logging out');
         e.preventDefault();
         signOut(auth).then(() => {
-            console.log('logged out');
             window.location.href = '/';
         }
         ).catch((error) => {
@@ -57,7 +58,6 @@ function updateProfile(user) {
     const email = user.email;
     const profile = user.photoURL;
     console.log(username, email, profile);
-    console.log('im outpuitting the uid')
     console.log(getUid());
     document.getElementById("user-name").textContent = username;
 }
@@ -67,32 +67,19 @@ onAuthStateChanged(auth, (user) => {
 });
 
 async function loginCheck(user){
-    console.log('auth state changed');
     if (user) {
-        console.log("logged in");
         console.log(user.uid);
         if (window.location.pathname.endsWith('/')){
             console.log(window.location.pathname);
-            console.log("im appparently trying to hide loginpage");
             document.getElementById("homepage").style.display = "block";
             document.getElementById("loginpage").style.display = "none";
             updateProfile(user)
             loadDesigns();
         } else if (window.location.pathname.endsWith('/edit.html')){
             setUid(user.uid);
-            console.log('im loading the design');
             const urlParams = new URLSearchParams(window.location.search);
             const design = urlParams.get('d');
-            if (design) {
-                // Load design
-                try {
-                    let designs = await getDesigns();
-                    const designData = designs['designs'][design];
-                    console.log(designData);
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
+            if (!design) {
                 window.location.href = '/';
             }
         }

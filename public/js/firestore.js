@@ -1,4 +1,4 @@
-import { initializeFirestore, CACHE_SIZE_UNLIMITED, doc, setDoc, addDoc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js';
+import { initializeFirestore, CACHE_SIZE_UNLIMITED, doc, setDoc, addDoc, getDoc, collection, updateDoc } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getUid, setUid } from './uid.js';
 
@@ -39,7 +39,7 @@ export async function add(name, data){
     if (docSnap.exists()) {
         try {
             let designs = docSnap.data();
-            designs['designs'].push({"name": name, "data": data, "lastModified": new Date().getTime()});
+            designs['designs'].push({"histindex": -1, "name": name, "data": data, "lastModified": new Date().getTime()});
             await setDoc(docRef, designs);
             console.log('success creating design');
         } catch (e) {
@@ -50,13 +50,19 @@ export async function add(name, data){
     }
 }
 
+export async function update(index, name, history, designs, hi){
+    var a = designs['designs'] // lets say i got 5 designs.
+    a[index] = {'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()}; // im updating lets say the 3rd design.
+    await updateDoc(doc(firestore, 'designs', getUid()), {'designs': a});
+}
+
 export async function getDesigns(){
-    console.log('uid: ' + getUid());
     await setup();
     const designsRef = collection(firestore, 'designs');
     const docRef = doc(designsRef, getUid());
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+        console.log(docSnap.data());
         return docSnap.data();
     } else {
         return [];
@@ -84,9 +90,11 @@ function addDesignCard(name, index){
 export async function loadDesigns() {
     console.log('im trying to load designs');
     await getDesigns().then(data => {
-        data.designs.sort((a, b) => b.lastModified - a.lastModified);
-        data.designs.forEach((design, index) => {
-            addDesignCard(design.name, index);
-        });
+        if (data['designs'].length > 0) {
+            data.designs.sort((a, b) => b.lastModified - a.lastModified);
+            data.designs.forEach((design, index) => {
+                addDesignCard(design.name, index);
+            });
+        }
     });
 }
