@@ -23,8 +23,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const item of designweusing['data']) {
         history.push(item);
     }
-    rows = history[historyIndex].rows;
-    columns = history[historyIndex].cols;
+    try {
+        rows = history[historyIndex].rows;
+        columns = history[historyIndex].cols;
+    } catch(e) {
+        //idgaf
+    }
     updateSeatingPlan();
     document.getElementById('editpage').style.display = 'block';
 });
