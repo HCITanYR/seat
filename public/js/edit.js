@@ -49,53 +49,17 @@ const minY = -500; // Set your minimum Y
 const maxY = 500;
 // TODO: need to calculate this
 
-let isDragging = false;
 let startX, startY, initialPosX = 0, initialPosY = 0;
+
+// change curser icon
 detect.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
     detect.style.cursor = 'grabbing';
 });
-
-
 document.addEventListener('mouseup', () => {
-    isDragging = false;
     detect.style.cursor = 'grab';
 });
 
-document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    let x = e.clientX - startX;
-    let y = e.clientY - startY;
-    initialPosX += x;
-    initialPosY += y;
 
-    // Check if the new position exceeds the maximum X
-    if (initialPosX > maxX) {
-        initialPosX = maxX;
-    }
-
-    // Check if the new position is less than the minimum X
-    if (initialPosX < minX) {
-        initialPosX = minX;
-    }
-
-    // Check if the new position exceeds the maximum Y
-    if (initialPosY > maxY) {
-        initialPosY = maxY;
-    }
-
-    // Check if the new position is less than the minimum Y
-    if (initialPosY < minY) {
-        initialPosY = minY;
-    }
-
-    frame.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
-    startX = e.clientX;
-    startY = e.clientY;
-});
 
 //zoom in and out
 
@@ -155,8 +119,27 @@ function redo() {
     }
 }
 
+// Undo Redo buttons
 document.getElementById('undo-btn').addEventListener('click', undo);
 document.getElementById('redo-btn').addEventListener('click', redo);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function (e) {
+    // Check if the Ctrl or Cmd key is pressed along with Z or Y
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+        // Undo action (Ctrl+Z or Cmd+Z)
+        e.preventDefault(); // Prevent the default browser behavior
+        undo();
+    } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+        // Redo action (Ctrl+Shift+Z or Cmd+Shift+Z)
+        e.preventDefault(); // Prevent the default browser behavior
+        redo();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        // Redo action (Ctrl+Y or Cmd+Y)
+        e.preventDefault(); // Prevent the default browser behavior
+        redo();
+    }
+});
 
 // Add a new row
 function addRow() {
@@ -187,7 +170,7 @@ function updateSeatingPlan() {
         rowDiv.classList.add('row');
         for (let col = 0; col < columns; col++) {
             const seatDiv = document.createElement('div');
-            seatDiv.classList.add('seat');
+            seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
             seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
             seatDiv.innerText = ``;
@@ -239,10 +222,26 @@ function addEditEventListener(student) {
         const studentName = e.dataTransfer.getData('text/plain');
         const targetSeat = e.target;
 
-        if (targetSeat.classList.contains('seat')) {
+        if (targetSeat.classList.contains('unoccupied')) { // if empty seat
             targetSeat.innerText = studentName;
-            targetSeat.classList.add('occupied'); // Add class for occupied seats
-        }
+            seatDiv.classList.remove('unoccupied');
+            targetSeat.classList.add('occupied'); // swaps status
+        } else if (targetSeat.classList.contains('occupied')) { // already occupied
+            if (targetSeat.innerText == studentName) {
+                return; // do nothing if same student is dropped
+            } else {
+                // to swap seats
+                const swappedName = targetSeat.innerText
+                const allSeats = document.querySelectorAll('.seat');
+                allSeats.forEach(seat => {
+                    if (seat.innerText == studentName && seat !== targetSeat) {
+                        seat.innerText = swappedName; // place the swapped name in the old seat
+                    }
+                });
+            }
+
+                targetSeat.innerText = studentName; // replace target
+            }
     }
 
     student.addEventListener('click', function (e) {
