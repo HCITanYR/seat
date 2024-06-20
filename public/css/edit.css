@@ -116,8 +116,3 @@
             -webkit-user-select: none;
             -ms-user-select: none;
         }
-
-        .highlighted {
-            background-color: '.bg-secondary';
-            /* or any other highlight color */
-        }
