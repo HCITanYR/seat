@@ -38,8 +38,9 @@ function updateDraggableSeats() {
     const allSeats = document.querySelectorAll('.seat');
     allSeats.forEach(seat => {
         seat.draggable = false; // default state
-        if (seat.classList.contains('occupied')) {
-            // can drag if seat is not empty
+        if (seat.classList.contains('occupied') && !document.getElementById('pan').classList.contains('btn-primary') && !document.getElementById('pan').classList.contains('btn-primary')) {
+            // can drag if seat is not empty and pan button is not toggled
+            // and pan not toggled
             seat.draggable = true;
             seat.addEventListener('dragstart', seatDragStart);
             seat.addEventListener('dragend', seatDragEnd);
@@ -178,13 +179,39 @@ const maxY = 500;
 
 let startX, startY, initialPosX = 0, initialPosY = 0;
 
-// change curser icon
+// mouse icons + pan functionality
 detect.addEventListener('mousedown', (e) => {
-    detect.style.cursor = 'grabbing';
+    if (!document.getElementById('pan').classList.contains('btn-primary') && e.target.draggable) {
+        detect.style.cursor = 'grabbing';
+    } else if (document.getElementById('pan').classList.contains('btn-primary')) {
+        // pan toggled
+        // TODO: add pan functionality
+        updateDraggableSeats(); // disable seat dragging
+    }
 });
 document.addEventListener('mouseup', () => {
-    detect.style.cursor = 'grab';
+
 });
+document.addEventListener('mousemove', (e) => {
+    // TODO: add pan stuff
+    // disable seat drag and drop
+});
+function handleMouseAction(e) {
+    updateDraggableSeats(); // enable seat dragging
+    if (document.getElementById('pan').classList.contains('btn-primary')) {
+        // if pan toggled
+        detect.style.cursor = 'move';
+    } else {
+        if (e.target.draggable) {
+            detect.style.cursor = 'grab';
+        } else {
+            detect.style.cursor = 'default';
+        }
+    }
+}
+
+document.addEventListener('mouseup', handleMouseAction);
+document.addEventListener('mouseover', handleMouseAction);
 
 
 
@@ -201,6 +228,13 @@ document.getElementById('zoom-out').addEventListener('click', function () {
         document.getElementById('seating-plan').style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
     }
 });
+
+// pan button
+document.getElementById('pan').addEventListener('click', function() {
+    this.classList.toggle('btn-primary');
+    this.classList.toggle('btn-outline-secondary');
+});
+
 
 // History state management
 
