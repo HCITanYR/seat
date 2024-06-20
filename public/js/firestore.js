@@ -41,6 +41,8 @@ export async function add(name, data){
             let designs = docSnap.data();
             designs['designs'].push({"histindex": -1, "name": name, "data": data, "lastModified": new Date().getTime()});
             await setDoc(docRef, designs);
+            const index = designs['designs'].length - 1;
+            window.location.href = 'edit.html?d=' + index;
             console.log('success creating design');
         } catch (e) {
             console.error("Error adding document: ", e);

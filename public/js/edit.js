@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch(e) {
         //idgaf
     }
-    updateSeatingPlan();
+    applyState(history[historyIndex]);
     document.getElementById('editpage').style.display = 'block';
 });
 
@@ -261,17 +261,21 @@ function saveState() {
 }
 
 function applyState(state) {
-    if (state > -1) {
+    if (historyIndex > -1) {
         document.getElementById('students-list').innerHTML = state.students;
         document.getElementById('seating-plan').innerHTML = state.seatingPlan;
         document.getElementById('layout-rows').value = state.rows;
         document.getElementById('layout-columns').value = state.cols;
         attachEventListeners();
+        updateDraggableSeats();
+        update(design, name, history, designs, historyIndex);
     }
 }
 
 function undo() {
+    console.log('undo');
     if (historyIndex > 0) {
+        console.log('undo success');
         historyIndex--;
         applyState(history[historyIndex]);
         updateDraggableSeats();
@@ -279,7 +283,10 @@ function undo() {
 }
 
 function redo() {
+    console.log('redo');
+    console.log(historyIndex, history.length);
     if (historyIndex < history.length - 1) {
+        console.log('redo success');
         historyIndex++;
         applyState(history[historyIndex]);
         updateDraggableSeats();
@@ -311,6 +318,7 @@ document.addEventListener('keydown', function (e) {
 document.getElementById('add-row').addEventListener('click', addRow);
 
 document.getElementById('add-column').addEventListener('click', addColumn);
+
 // Add a new row
 function addRow() {
     const rowsInput = document.getElementById('layout-rows');
@@ -330,6 +338,8 @@ function addColumn() {
     
     saveState(); // Save the new seating plan state
 }
+
+
 
 //   seating plan
 function updateSeatingPlan() {
