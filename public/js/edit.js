@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const item of designweusing['data']) {
         history.push(item);
     }
+    if (history.length == 0) {
+        updateSeatingPlan();
+        saveState();
+    }
     try {
         rows = history[historyIndex].rows;
         columns = history[historyIndex].cols;
@@ -343,6 +347,7 @@ function addColumn() {
 
 //   seating plan
 function updateSeatingPlan() {
+    console.log('updating seating plan');
     const seatingPlanContainer = document.getElementById('seating-plan'); // Number of columns
 
     // Clear the existing seating plan
@@ -367,7 +372,6 @@ function updateSeatingPlan() {
 
 // Adding delete button to student
 function addDeleteButton(student) {
-    console.log('adding delete button');
     var deleteBtn = document.createElement('span');
     deleteBtn.className = 'delete-btn';
     deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
@@ -411,7 +415,6 @@ function addEditEventListener(student) {
         input.focus();
 
         function handleInput(e) {
-            console.log('editing name');
             var newName = e.target.value.trim();
 
             if (newName && newName !== originalName) {
@@ -490,15 +493,12 @@ document.getElementById('csv-file').addEventListener('change', function (event) 
             const table = document.getElementById('csv-table');
             table.innerHTML = ''; // Clear existing table content
             let isMouseDown = false;
-            console.log('mouse down detection');
             table.addEventListener('mousedown', function () {
                 isMouseDown = true;
-                console.log('Mouse is pressed down');
             });
 
             table.addEventListener('mouseup', function () {
                 isMouseDown = false;
-                console.log('Mouse is released');
             });
             rows.forEach(row => {
                 const cells = row.split(',');
