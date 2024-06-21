@@ -43,7 +43,7 @@ export async function add(name, data){
             await setDoc(docRef, designs);
             const index = designs['designs'].length - 1;
             window.location.href = 'edit.html?d=' + index;
-            console.log('success creating design');
+            console.log('success creating design, redirecting to edit.html?d=' + index);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
