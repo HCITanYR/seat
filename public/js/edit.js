@@ -16,9 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         await new Promise(resolve => setTimeout(resolve));
     }
     designs = await getDesigns();
-    var designweusing = designs['designs'][design];
-    name = designweusing['name'];
-    historyIndex = designweusing['histindex'];
+    try {
+        var designweusing = designs['designs'][design];
+        name = designweusing['name'];
+        historyIndex = designweusing['histindex'];
+        console.log(historyIndex);
+    } catch(e) {   
+        //
+    }
     document.getElementById('designtitle').innerHTML = name;
     for (const item of designweusing['data']) {
         history.push(item);
@@ -378,7 +383,7 @@ function addDeleteButton(student) {
     deleteBtn.addEventListener('click', function () {
         student.remove(); // remove student from list
 
-        studentName = student.innerText;
+        var studentName = student.innerText;
         // find if the student is already seated 
         const allSeats = document.querySelectorAll('.seat');
         allSeats.forEach(seat => {
