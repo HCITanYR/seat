@@ -18,76 +18,209 @@
 
         .container {
             background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
         }
 
         h1 {
             text-align: center;
+            font-weight: bold;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 30px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
         }
 
         input {
-            width: 100%;
-            padding: 8px;
+            width: calc(100% - 70px);
+            padding: 10px;
             box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-weight: bold;
         }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
-            color: #fff;
+        .add-btn {
+            width: 50px;
+            margin-left: 10px;
+            background-color: #ccc;
+            color: #000;
             border: none;
             border-radius: 5px;
+            padding: 10px;
             cursor: pointer;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .add-btn:hover {
+            background-color: #aaa;
+        }
+
+        .form-column {
+            display: inline-block;
+            vertical-align: top;
+            width: 48%;
+            padding: 1%;
+        }
+
+        #settingsForm {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            color: #000;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            color: #555;
+        }
+
+        .student-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .student-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .input-separate {
+            position: relative;
+        }
+
+        .input-separate input {
+            width: 100%;
+            padding-right: 50px;
+        }
+
+        .input-separate .add-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            margin: 0;
+            border-radius: 0 10px 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Seating Plan Settings</h1>
+        <button class="close-btn" onclick="closeSettings()">X</button>
+        <h1>Settings</h1>
         <form id="settingsForm">
-            <div class="form-group">
-                <label for="seatSpacing">Seat Spacing (px):</label>
-                <input type="number" id="seatSpacing" name="seatSpacing" min="0" required>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="frontRowStudent">Sit in front</label>
+                    <div class="input-container">
+                        <input type="text" id="frontRowStudent">
+                        <button type="button" class="add-btn" onclick="addStudent('front')">+</button>
+                    </div>
+                </div>
+                <ul id="frontRowList" class="student-list"></ul>
+                <div class="form-group">
+                    <label for="backRowStudent">Sit in back</label>
+                    <div class="input-container">
+                        <input type="text" id="backRowStudent">
+                        <button type="button" class="add-btn" onclick="addStudent('back')">+</button>
+                    </div>
+                </div>
+                <ul id="backRowList" class="student-list"></ul>
             </div>
-            <div class="form-group">
-                <label for="frontRowStudents">Students in Front Row (comma separated):</label>
-                <input type="text" id="frontRowStudents" name="frontRowStudents">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="separatedStudent">Separate</label>
+                    <div class="input-separate">
+                        <input type="text" id="separatedStudent">
+                        <button type="button" class="add-btn" onclick="addStudent('separated')">+</button>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addStudent('separated')">+</button>
+                </div>
+                <ul id="separatedList" class="student-list"></ul>
+                <div class="form-group">
+                    <label for="lockedStudent">Lock students</label>
+                    <div class="input-container">
+                        <input type="text" id="lockedStudent">
+                        <button type="button" class="add-btn" onclick="addStudent('locked')">+</button>
+                    </div>
+                </div>
+                <ul id="lockedList" class="student-list"></ul>
             </div>
-            <div class="form-group">
-                <label for="backRowStudents">Students in Back Row (comma separated):</label>
-                <input type="text" id="backRowStudents" name="backRowStudents">
-            </div>
-            <div class="form-group">
-                <label for="separatedStudents">Students to Separate (comma separated pairs):</label>
-                <input type="text" id="separatedStudents" name="separatedStudents">
-            </div>
-            <button type="button" onclick="submitSettings()">Submit Settings</button>
         </form>
     </div>
     <script>
+        function closeSettings() {
+            // Add your logic to handle the close button action as needed
+            console.log('Settings closed');
+        }
+
+        function addStudent(type) {
+            let inputId, listId;
+            switch (type) {
+                case 'front':
+                    inputId = 'frontRowStudent';
+                    listId = 'frontRowList';
+                    break;
+                case 'back':
+                    inputId = 'backRowStudent';
+                    listId = 'backRowList';
+                    break;
+                case 'separated':
+                    inputId = 'separatedStudent';
+                    listId = 'separatedList';
+                    break;
+                case 'locked':
+                    inputId = 'lockedStudent';
+                    listId = 'lockedList';
+                    break;
+            }
+
+            const inputValue = document.getElementById(inputId).value;
+            if (inputValue) {
+                const li = document.createElement('li');
+                li.textContent = inputValue;
+                document.getElementById(listId).appendChild(li);
+                document.getElementById(inputId).value = '';
+            }
+        }
+
         function submitSettings() {
             const settings = {
-                seatSpacing: document.getElementById('seatSpacing').value,
-                frontRowStudents: document.getElementById('frontRowStudents').value.split(',').map(s => s.trim()),
-                backRowStudents: document.getElementById('backRowStudents').value.split(',').map(s => s.trim()),
-                separatedStudents: document.getElementById('separatedStudents').value.split(',').map(pair => pair.trim().split('-'))
+                frontRowStudents: Array.from(document.getElementById('frontRowList').children).map(li => li.textContent),
+                backRowStudents: Array.from(document.getElementById('backRowList').children).map(li => li.textContent),
+                separatedStudents: Array.from(document.getElementById('separatedList').children).map(li => li.textContent),
+                lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent)
             };
 
             console.log(settings);
