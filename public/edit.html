@@ -17,6 +17,14 @@
             <div class="col-12">
                 <button onclick="window.location.href='/';" class="btn btn-primary mt-2 ml-2" title="i know this is very goofy i dont do design i just code">Home</button>
             </div>
+            <button id="popupBtn">Open Popup</button>
+
+        <div id="popupContainer" class="popupContainer">
+        <div class="popupContent">
+            <span class="closeBtn" onclick="closePopup()">&times;</span>
+            <iframe src="https://seat-87c59.firebaseapp.com/settings.html?d=0" frameborder="0"></iframe>
+        </div>
+        </div>
             <h1 class="text-center" id="designtitle">3A3 Seating Plan</h1>
         </div>
        
@@ -128,12 +136,24 @@
     </div>
     </div>
 </div>
-
+    
     <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="js/edit.js" type="module"></script>
+    <script>
+        const popupBtn = document.getElementById('popupBtn');
+        const popupContainer = document.getElementById('popupContainer');
+
+        popupBtn.addEventListener('click', () => {
+        popupContainer.style.display = 'block';
+        });
+
+        function closePopup() {
+        popupContainer.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
