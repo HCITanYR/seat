@@ -16,7 +16,7 @@
         <div>
             <div class="col-12">
                 <button onclick="window.location.href='/';" class="btn btn-primary mt-2 ml-2" title="i know this is very goofy i dont do design i just code">Home</button>
-                <button onclick="window.location.href='https://seat-87c59.firebaseapp.com/settings.html';" class="btn btn-secondary mt-2 ml-2">Settings</button>
+                <button type="button" class="btn btn-secondary mt-2 ml-2" data-toggle="modal" data-target="#settingsModal">Settings</button>
             </div>
             <h1 class="text-center" id="designtitle">3A3 Seating Plan</h1>
         </div>
@@ -128,13 +128,113 @@
         </div>
     </div>
     </div>
-</div>
-    
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="frontRowStudent">Sit in front</label>
+                                <div class="input-container">
+                                    <input type="text" id="frontRowStudent">
+                                    <button type="button" class="add-btn" onclick="addStudent('front')">+</button>
+                                </div>
+                            </div>
+                            <ul id="frontRowList" class="student-list"></ul>
+                            <div class="form-group">
+                                <label for="backRowStudent">Sit in back</label>
+                                <div class="input-container">
+                                    <input type="text" id="backRowStudent">
+                                    <button type="button" class="add-btn" onclick="addStudent('back')">+</button>
+                                </div>
+                            </div>
+                            <ul id="backRowList" class="student-list"></ul>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="separatedStudent">Separate</label>
+                                <div class="input-separate">
+                                    <input type="text" id="separatedStudent">
+                                    <button type="button" class="add-btn" onclick="addStudent('separated')">+</button>
+                                </div>
+                            </div>
+                            <ul id="separatedList" class="student-list"></ul>
+                            <div class="form-group">
+                                <label for="lockedStudent">Lock students</label>
+                                <div class="input-container">
+                                    <input type="text" id="lockedStudent">
+                                    <button type="button" class="add-btn" onclick="addStudent('locked')">+</button>
+                                </div>
+                            </div>
+                            <ul id="lockedList" class="student-list"></ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitSettings()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="../js/edit.js" type="module"></script>
+
+    <script>
+        function addStudent(type) {
+            let inputId, listId;
+            switch (type) {
+                case 'front':
+                    inputId = 'frontRowStudent';
+                    listId = 'frontRowList';
+                    break;
+                case 'back':
+                    inputId = 'backRowStudent';
+                    listId = 'backRowList';
+                    break;
+                case 'separated':
+                    inputId = 'separatedStudent';
+                    listId = 'separatedList';
+                    break;
+                case 'locked':
+                    inputId = 'lockedStudent';
+                    listId = 'lockedList';
+                    break;
+            }
+
+            const inputValue = document.getElementById(inputId).value;
+            if (inputValue) {
+                const li = document.createElement('li');
+                li.textContent = inputValue;
+                document.getElementById(listId).appendChild(li);
+                document.getElementById(inputId).value = '';
+            }
+        }
+
+        function submitSettings() {
+            const settings = {
+                frontRowStudents: Array.from(document.getElementById('frontRowList').children).map(li => li.textContent),
+                backRowStudents: Array.from(document.getElementById('backRowList').children).map(li => li.textContent),
+                separatedStudents: Array.from(document.getElementById('separatedList').children).map(li => li.textContent),
+                lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent)
+            };
+
+            console.log(settings);
+            // Add your logic to handle the settings as needed
+        }
+    </script>
 </body>
 </html>
