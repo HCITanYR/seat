@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         await new Promise(resolve => setTimeout(resolve));
     }
     designs = await getDesigns(uid);
+    if (designs['designs'].length <= design){
+        //redirect home
+        window.location.href = '/';
+    }
     try {
         var designweusing = designs['designs'][design];
         name = designweusing['name'];

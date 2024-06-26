@@ -67,6 +67,9 @@ export async function getDesigns(uid){
         console.log(docSnap.data());
         return docSnap.data();
     } else {
+        if (window.location.pathname !== '/') {
+            window.location.href = '/';
+        }
         return [];
     }
 }
