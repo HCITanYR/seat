@@ -87,14 +87,14 @@ function addDesignCard(name, index){
     card.appendChild(para);
     col.appendChild(card);
     col.addEventListener('click', () => {
-        window.location.href = 'edit.html?d=' + index;
+        window.location.href = '/designs/' + getUid() + '?d=' + index;
     });
     document.getElementById('designRow').appendChild(col);
 }
 
 export async function loadDesigns() {
     console.log('im trying to load designs');
-    await getDesigns().then(data => {
+    await getDesigns(getUid()).then(data => {
         if (data['designs'].length > 0) {
             data.designs.sort((a, b) => b.lastModified - a.lastModified);
             data.designs.forEach((design, index) => {
