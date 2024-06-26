@@ -3,6 +3,10 @@ var history = [];
 let historyIndex = -1;
 const urlParams = new URLSearchParams(window.location.search);
 const design = urlParams.get('d');
+var currentUrl = window.location.href;
+var urlSegments = currentUrl.split('/');
+var uid = urlSegments[4].split('?')[0]; // 'ghjk'
+
 var designs = null;
 var rows = 2;
 var columns = 2;
@@ -15,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     while (getUid() === null) {
         await new Promise(resolve => setTimeout(resolve));
     }
-    designs = await getDesigns();
+    designs = await getDesigns(uid);
     try {
         var designweusing = designs['designs'][design];
         name = designweusing['name'];

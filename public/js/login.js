@@ -1,7 +1,3 @@
-var designName = '';
-var designData = null;
-
-
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 import { getUid, setUid } from './uid.js';
@@ -31,6 +27,11 @@ if (window.location.pathname.endsWith('/')){
         console.log('Logging out');
         e.preventDefault();
         signOut(auth).then(() => {
+            var redirectUrl = sessionStorage.getItem('redirectUrl');
+            if (redirectUrl) {
+                // Clear the stored URL
+                sessionStorage.removeItem('redirectUrl');
+            }
             window.location.href = '/';
         }
         ).catch((error) => {
@@ -70,11 +71,19 @@ async function loginCheck(user){
     if (user) {
         console.log(user.uid);
         if (window.location.pathname.endsWith('/')){
-            console.log(window.location.pathname);
-            document.getElementById("homepage").style.display = "block";
-            document.getElementById("loginpage").style.display = "none";
-            updateProfile(user)
-            loadDesigns();
+            var redirectUrl = sessionStorage.getItem('redirectUrl');
+            if (redirectUrl) {
+                // Clear the stored URL
+                sessionStorage.removeItem('redirectUrl');
+                // Redirect back to the stored URL
+                window.location.href = redirectUrl;
+            } else {
+                console.log(window.location.pathname);
+                document.getElementById("homepage").style.display = "block";
+                document.getElementById("loginpage").style.display = "none";
+                updateProfile(user)
+                loadDesigns();
+            }
         } else if (window.location.pathname.endsWith('/edit.html')){
             setUid(user.uid);
             const urlParams = new URLSearchParams(window.location.search);
@@ -86,10 +95,11 @@ async function loginCheck(user){
     } else {
         console.log("not logged in");
         if (window.location.pathname.endsWith('/')) {
-            
             document.getElementById("homepage").style.display = "none";
             document.getElementById("loginpage").style.display = "block";
         } else {
+            // Capture the current URL before redirecting to login
+            sessionStorage.setItem('redirectUrl', window.location.href);
             window.location.href = '../';
         }
     }

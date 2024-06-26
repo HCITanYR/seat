@@ -58,10 +58,10 @@ export async function update(index, name, history, designs, hi){
     await updateDoc(doc(firestore, 'designs', getUid()), {'designs': a});
 }
 
-export async function getDesigns(){
+export async function getDesigns(uid){
     await setup();
     const designsRef = collection(firestore, 'designs');
-    const docRef = doc(designsRef, getUid());
+    const docRef = doc(designsRef, uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         console.log(docSnap.data());
