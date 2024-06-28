@@ -5,7 +5,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const design = urlParams.get('d');
 var currentUrl = window.location.href;
 var urlSegments = currentUrl.split('/');
-var uid = urlSegments[4].split('?')[0]; // 'ghjk'
+var uid = urlSegments[4].split('?')[0];
 var Students = [];
 
 var seatlist = ['','','',''];
@@ -26,29 +26,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         //redirect home
         window.location.href = '/';
     }
-    try {
-        var designweusing = designs['designs'][design];
-        name = designweusing['name'];
-        historyIndex = designweusing['histindex'];
-    } catch(e) {   
-        //
-    }
-    document.getElementById('designtitle').innerHTML = name;
+    var designweusing = designs['designs'][design];
+    name = designweusing['name'];
+    historyIndex = designweusing['histindex'];
     for (const item of designweusing['data']) {
         history.push(item);
     }
     if (history.length == 0) {
         updateSeatingPlan();
         saveState();
-    }
-    try {
-        seatlist = history[historyIndex].seatlist;
+    } else {
+        seatlist = history[historyIndex].seatingPlan;
         rows = history[historyIndex].rows;
         columns = history[historyIndex].cols;
-    } catch(e) {
-        //idgaf
+        applyState(history[historyIndex]);
     }
-    applyState(history[historyIndex]);
+    document.getElementById('designtitle').innerHTML = name;
     document.getElementById('editpage').style.display = 'block';
 });
 
@@ -254,10 +247,6 @@ document.getElementById('pan').addEventListener('click', function() {
     this.classList.toggle('btn-outline-secondary');
 });
 
-
-// History state management
-
-
 function saveState() {
     const state = {
         students: Students,
@@ -265,15 +254,8 @@ function saveState() {
         rows: rows,
         cols: columns,
     };
-    if (historyIndex < history.length - 1) {
-        history.splice(historyIndex + 1);
-    }
     history.push(state);
-    if (history.length > 255) {
-        history.shift();
-    } else {
-        historyIndex++;
-    }
+    historyIndex++;
     updateDraggableSeats();
     update(design, name, history, designs, historyIndex, uid);
 }
@@ -282,6 +264,11 @@ function applyState(state) {
     if (historyIndex > -1) {
         // document.getElementById('students-list').innerHTML = state.students;
         seatlist = state.seatingPlan;
+        Students = state.students;
+        document.getElementById('students-list').innerHTML = '';
+        Students.forEach(student => {
+            appendStudent(student);
+        });
         document.getElementById('layout-rows').value = state.rows;
         document.getElementById('layout-columns').value = state.cols;
         attachEventListeners();
@@ -292,9 +279,7 @@ function applyState(state) {
 }
 
 function undo() {
-    console.log('undo');
     if (historyIndex > 0) {
-        console.log('undo success');
         historyIndex--;
         applyState(history[historyIndex]);
         updateDraggableSeats();
@@ -302,10 +287,7 @@ function undo() {
 }
 
 function redo() {
-    console.log('redo');
-    console.log(historyIndex, history.length);
     if (historyIndex < history.length - 1) {
-        console.log('redo success');
         historyIndex++;
         applyState(history[historyIndex]);
         updateDraggableSeats();
@@ -360,14 +342,12 @@ function addRow() {
     rowsInput.value = parseInt(rowsInput.value) + 1;
     rows += 1;
     updateSeatingPlan();
-    
     saveState(); // Save the new seating plan state
 }
 
 // Add a new column
 function addColumn() {
     //columns ++;
-    console.log(seatlist.length);
     let i = 0;
     let temp = [];
     // loop through n columns, add, add to list continue.
@@ -406,7 +386,6 @@ function updateSeatingPlan() {
             seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
         } else {
-            console.log('seat: ' +  seatlist[i]);
             seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
             seatDiv.innerText = seatlist[i];
@@ -429,6 +408,7 @@ function addDeleteButton(student) {
         student.remove(); // remove student from list
 
         var studentName = student.innerText;
+        Students = Students.filter(name => name !== studentName); // remove student from array
         // find if the student is already seated 
         const allSeats = document.querySelectorAll('.seat');
         allSeats.forEach(seat => {
@@ -472,13 +452,13 @@ function addEditEventListener(student) {
                 var studentList = document.getElementById('students-list');
                 var students = Array.from(studentList.getElementsByClassName('student'));
                 var names = students.map(student => student.textContent);
-
                 if (names.includes(newName)) {
                     // Show the error modal
                     $('#errorModal').modal('show');
                     e.target.parentElement.textContent = originalName; // Revert to the original name
                 } else {
                     e.target.parentElement.textContent = newName;
+                    Students[Students.indexOf(originalName)] = newName;
                     saveState(); // Save state after editing a student name
                 }
             } else {
@@ -511,21 +491,28 @@ document.getElementById('new-student').addEventListener('keypress', function (e)
             if (names.includes(studentName)) {
                 errorMessage.textContent = 'Error: Student name already exists!';
             } else {
-                var newStudent = document.createElement('div');
-                var name = document.createElement('span');
-                name.textContent = studentName;
-                newStudent.className = 'student';
-                newStudent.appendChild(name);
-                addDeleteButton(newStudent); // Add delete button to new student
-                studentList.appendChild(newStudent);
-                e.target.value = '';
-                addEditEventListener(name);
+                appendStudent(studentName, e);
+                Students.push(studentName);
                 saveState(); // Save state after adding a student
             }
         }
         e.preventDefault(); // Prevent form submission
     }
 });
+
+function appendStudent(studentName, e=null) {
+    var newStudent = document.createElement('div');
+    var name = document.createElement('span');
+    name.textContent = studentName;
+    newStudent.className = 'student';
+    newStudent.appendChild(name);
+    addDeleteButton(newStudent); // Add delete button to new student
+    document.getElementById('students-list').appendChild(newStudent);
+    if (e != null){
+        e.target.value = '';
+    }
+    addEditEventListener(name);
+}
 
 // Import from CSV
 document.getElementById('import-btn').addEventListener('click', function () {

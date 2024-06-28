@@ -53,8 +53,8 @@ export async function add(name, data){
 }
 
 export async function update(index, name, history, designs, hi, uid){
-    var a = designs['designs'] // lets say i got 5 designs.
-    a[index] = {'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()}; // im updating lets say the 3rd design.
+    var a = designs['designs'];
+    a[index] = {'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()};
     await updateDoc(doc(firestore, 'designs', uid), {'designs': a});
 }
 

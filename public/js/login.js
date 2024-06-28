@@ -24,7 +24,6 @@ let provider = new GoogleAuthProvider();
 if (window.location.pathname.endsWith('/')){
     document.getElementById('login').addEventListener('click', GoogleLogin);
     document.getElementById('logout').addEventListener('click', (e) => {
-        console.log('Logging out');
         e.preventDefault();
         signOut(auth).then(() => {
             var redirectUrl = sessionStorage.getItem('redirectUrl');
@@ -41,7 +40,6 @@ if (window.location.pathname.endsWith('/')){
 }
 
 function GoogleLogin() {
-    console.log('Logging in');
     signInWithRedirect(auth, provider).then(result => {
         if (result.credential) {
             var credential = result.credential;
@@ -58,8 +56,6 @@ function updateProfile(user) {
     const username = user.displayName;
     const email = user.email;
     const profile = user.photoURL;
-    console.log(username, email, profile);
-    console.log(getUid());
     document.getElementById("user-name").textContent = username;
 }
 
@@ -69,7 +65,6 @@ onAuthStateChanged(auth, (user) => {
 
 async function loginCheck(user){
     if (user) {
-        console.log(user.uid);
         if (window.location.pathname.endsWith('/')){
             var redirectUrl = sessionStorage.getItem('redirectUrl');
             if (redirectUrl) {
@@ -78,7 +73,6 @@ async function loginCheck(user){
                 // Redirect back to the stored URL
                 window.location.href = redirectUrl;
             } else {
-                console.log(window.location.pathname);
                 document.getElementById("homepage").style.display = "block";
                 document.getElementById("loginpage").style.display = "none";
                 updateProfile(user)
@@ -93,7 +87,6 @@ async function loginCheck(user){
             }
         }
     } else {
-        console.log("not logged in");
         if (window.location.pathname.endsWith('/')) {
             document.getElementById("homepage").style.display = "none";
             document.getElementById("loginpage").style.display = "block";
