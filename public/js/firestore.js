@@ -52,10 +52,10 @@ export async function add(name, data){
     }
 }
 
-export async function update(index, name, history, designs, hi){
+export async function update(index, name, history, designs, hi, uid){
     var a = designs['designs'] // lets say i got 5 designs.
     a[index] = {'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()}; // im updating lets say the 3rd design.
-    await updateDoc(doc(firestore, 'designs', getUid()), {'designs': a});
+    await updateDoc(doc(firestore, 'designs', uid), {'designs': a});
 }
 
 export async function getDesigns(uid){

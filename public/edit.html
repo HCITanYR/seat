@@ -86,12 +86,27 @@
                                 <button class="btn btn-outline-secondary" id="redo-btn">Redo</button>
                             </div>
                         </div>
-                        <!-- Seating plan layout -->
-                        <div id="zoomable-content" class="bg-info">
-                            <div class="seating-plan flex-grow-1 d-flex" id="seating-plan">
-                                <!-- Seat elements will be dynamically inserted here -->
+
+                        <!-- Top add row button -->
+                        <button class="btn btn-outline-primary m-2 add-row">Add Row</button>
+                       
+                        <div class="d-flex align-items-center justify-content-between" style="height: 50%;">
+                            <!-- Left Add Column Button -->
+                            <button class="btn btn-outline-primary m-2 rotate-text add-column">Add Column</button>
+                            
+                            <!-- Seating Plan Layout -->
+                            <div id="zoomable-content" class="bg-info flex-grow-1 d-flex justify-content-center align-items-center">
+                                <div class="seating-plan" id="seating-plan">
+                                    <!-- Seat elements will be dynamically inserted here -->
+                                </div>
                             </div>
+
+                            <!-- Right Add Column Button -->
+                            <button class="btn btn-outline-primary m-2 rotate-text add-column">Add Column</button>
                         </div>
+
+                        <!-- Top add row button -->
+                        <button class="btn btn-outline-primary m-2 add-row">Add Row</button>
 
                         <!-- Bottom row buttons -->
                         <div class="d-flex justify-content-center mt-4">

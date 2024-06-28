@@ -2,6 +2,34 @@
         body {
             background-color: #ffffff;
         }
+
+        /* Rotate text 90 degrees */
+        .rotate-text {
+            writing-mode: vertical-rl;
+            /* Rotate text to vertical */
+            transform: rotate(180deg);
+            /* Adjust the text orientation */
+            height: 100%;
+            /* Occupy full height of the container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            /* Remove default button margins */
+            text-align: center;
+            /* Center text */
+        }
+
+        /* Adjust button styles to fill container */
+        .btn-outline-primary.rotate-text {
+            width: auto;
+            /* Let height control the button size */
+            border-radius: 0;
+            /* Square edges */
+            padding: 0.5rem;
+            /* Adjust padding for better text readability */
+        }
+
         .seating-plan {
             display: flex;
             flex-direction: column;
@@ -44,6 +72,11 @@
             background-color: #d2a679;
             /* Background color for occupied seats */
         }
+        .seat.empty {
+            background-color: #ccc;
+            opacity: 0;
+            /* Grey for unoccupied seats */
+        }
 
         /* Visual feedback while a seat is being dragged */
         .dragging {
@@ -77,7 +110,7 @@
             content: "\f071";
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
-            position: absolute;
+            position: x;
             top: 5px;
             right: 5px;
             font-size: 14px;

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,10 +19,10 @@
 
         .container {
             background-color: #fff;
-            padding: 40px;
+            padding: 20px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -31,16 +32,22 @@
         h1 {
             text-align: center;
             font-weight: bold;
+            display: none;
         }
 
         .form-group {
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
 
         label {
-            display: block;
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
             font-weight: bold;
+        }
+
+        .bi-tag-fill, .bi-lock-fill {
+            margin-right: 5px;
         }
 
         .input-container {
@@ -49,17 +56,16 @@
         }
 
         input {
-            width: calc(100% - 70px);
+            width: 100%;
             padding: 10px;
             box-sizing: border-box;
-            border-radius: 10px;
+            border-radius: 5px;
             border: 1px solid #ccc;
-            font-weight: bold;
         }
 
         .add-btn {
-            width: 50px;
-            margin-left: 10px;
+            width: 40px;
+            margin-left: 5px;
             background-color: #ccc;
             color: #000;
             border: none;
@@ -114,6 +120,9 @@
             background-color: #f9f9f9;
             border-radius: 5px;
             border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .input-separate {
@@ -131,7 +140,11 @@
             top: 0;
             height: 100%;
             margin: 0;
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .submit-btn {
+            display: none;
         }
     </style>
 </head>
@@ -142,7 +155,7 @@
         <form id="settingsForm">
             <div class="form-column">
                 <div class="form-group">
-                    <label for="frontRowStudent">Sit in front</label>
+                    <label for="frontRowStudent"><i class="bi bi-tag-fill"></i>Sit in front</label>
                     <div class="input-container">
                         <input type="text" id="frontRowStudent">
                         <button type="button" class="add-btn" onclick="addStudent('front')">+</button>
@@ -150,17 +163,25 @@
                 </div>
                 <ul id="frontRowList" class="student-list"></ul>
                 <div class="form-group">
-                    <label for="backRowStudent">Sit in back</label>
+                    <label for="backRowStudent"><i class="bi bi-tag-fill"></i>Sit at back</label>
                     <div class="input-container">
                         <input type="text" id="backRowStudent">
                         <button type="button" class="add-btn" onclick="addStudent('back')">+</button>
                     </div>
                 </div>
                 <ul id="backRowList" class="student-list"></ul>
+                <div class="form-group">
+                    <label for="createTag"><i class="bi bi-tag-fill"></i>Create Tag</label>
+                    <div class="input-container">
+                        <input type="text" id="createTag">
+                        <button type="button" class="add-btn" onclick="addStudent('createTag')">+</button>
+                    </div>
+                </div>
+                <ul id="createTagList" class="student-list"></ul>
             </div>
             <div class="form-column">
                 <div class="form-group">
-                    <label for="separatedStudent">Separate</label>
+                    <label for="separatedStudent"><i class="bi bi-tag-fill"></i>Separate</label>
                     <div class="input-separate">
                         <input type="text" id="separatedStudent">
                         <button type="button" class="add-btn" onclick="addStudent('separated')">+</button>
@@ -168,7 +189,7 @@
                 </div>
                 <ul id="separatedList" class="student-list"></ul>
                 <div class="form-group">
-                    <label for="lockedStudent">Lock students</label>
+                    <label for="lockedStudent"><i class="bi bi-lock-fill"></i>Lock students</label>
                     <div class="input-container">
                         <input type="text" id="lockedStudent">
                         <button type="button" class="add-btn" onclick="addStudent('locked')">+</button>
@@ -177,6 +198,7 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
+        <button class="submit-btn" onclick="submitSettings()">Submit</button>
     </div>
     <script>
         function closeSettings() {
@@ -202,6 +224,10 @@
                     inputId = 'lockedStudent';
                     listId = 'lockedList';
                     break;
+                case 'createTag':
+                    inputId = 'createTag';
+                    listId = 'createTagList';
+                    break;
             }
 
             const inputValue = document.getElementById(inputId).value;
@@ -218,7 +244,8 @@
                 frontRowStudents: Array.from(document.getElementById('frontRowList').children).map(li => li.textContent),
                 backRowStudents: Array.from(document.getElementById('backRowList').children).map(li => li.textContent),
                 separatedStudents: Array.from(document.getElementById('separatedList').children).map(li => li.textContent),
-                lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent)
+                lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent),
+                createTags: Array.from(document.getElementById('createTagList').children).map(li => li.textContent)
             };
 
             console.log(settings);

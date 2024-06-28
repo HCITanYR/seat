@@ -6,7 +6,9 @@ const design = urlParams.get('d');
 var currentUrl = window.location.href;
 var urlSegments = currentUrl.split('/');
 var uid = urlSegments[4].split('?')[0]; // 'ghjk'
+var Students = [];
 
+var seatlist = ['','','',''];
 var designs = null;
 var rows = 2;
 var columns = 2;
@@ -28,7 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         var designweusing = designs['designs'][design];
         name = designweusing['name'];
         historyIndex = designweusing['histindex'];
-        console.log(historyIndex);
     } catch(e) {   
         //
     }
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveState();
     }
     try {
+        seatlist = history[historyIndex].seatlist;
         rows = history[historyIndex].rows;
         columns = history[historyIndex].cols;
     } catch(e) {
@@ -257,10 +259,9 @@ document.getElementById('pan').addEventListener('click', function() {
 
 
 function saveState() {
-    console.log('saving state');
     const state = {
-        students: document.getElementById('students-list').innerHTML,
-        seatingPlan: document.getElementById('seating-plan').innerHTML,
+        students: Students,
+        seatingPlan: seatlist,
         rows: rows,
         cols: columns,
     };
@@ -274,18 +275,19 @@ function saveState() {
         historyIndex++;
     }
     updateDraggableSeats();
-    update(design, name, history, designs, historyIndex);
+    update(design, name, history, designs, historyIndex, uid);
 }
 
 function applyState(state) {
     if (historyIndex > -1) {
-        document.getElementById('students-list').innerHTML = state.students;
-        document.getElementById('seating-plan').innerHTML = state.seatingPlan;
+        // document.getElementById('students-list').innerHTML = state.students;
+        seatlist = state.seatingPlan;
         document.getElementById('layout-rows').value = state.rows;
         document.getElementById('layout-columns').value = state.cols;
         attachEventListeners();
         updateDraggableSeats();
-        update(design, name, history, designs, historyIndex);
+        update(design, name, history, designs, historyIndex, uid);
+        updateSeatingPlan();
     }
 }
 
@@ -334,10 +336,26 @@ document.addEventListener('keydown', function (e) {
 
 document.getElementById('add-row').addEventListener('click', addRow);
 
+document.querySelectorAll('.add-row').forEach(element => {
+    element.addEventListener('click', addRow);
+  }
+);
+
+document.querySelectorAll('.add-column').forEach(element => {
+    element.addEventListener('click', addColumn);
+  }
+);
+
+
 document.getElementById('add-column').addEventListener('click', addColumn);
 
 // Add a new row
 function addRow() {
+    let i = 0;
+    while (i < columns){
+        seatlist.push('');
+        i++;
+    }
     const rowsInput = document.getElementById('layout-rows');
     rowsInput.value = parseInt(rowsInput.value) + 1;
     rows += 1;
@@ -348,11 +366,23 @@ function addRow() {
 
 // Add a new column
 function addColumn() {
+    //columns ++;
+    console.log(seatlist.length);
+    let i = 0;
+    let temp = [];
+    // loop through n columns, add, add to list continue.
+    while (i < seatlist.length) {
+        temp.push(seatlist[i]);
+        i += 1;
+        if((i+1) % columns == 0){
+            temp.push('');
+        }
+    }
+    seatlist = temp;
     const columnsInput = document.getElementById('layout-columns');
     columnsInput.value = parseInt(columnsInput.value) + 1;
     columns += 1;
     updateSeatingPlan();
-    
     saveState(); // Save the new seating plan state
 }
 
@@ -360,25 +390,32 @@ function addColumn() {
 
 //   seating plan
 function updateSeatingPlan() {
-    console.log('updating seating plan');
     const seatingPlanContainer = document.getElementById('seating-plan'); // Number of columns
 
     // Clear the existing seating plan
     seatingPlanContainer.innerHTML = '';
-
-    // Generate new seating plan based on rows and columns input
-    for (let row = 0; row < rows; row++) {
-        const rowDiv = document.createElement('div');
-        rowDiv.classList.add('row');
-        for (let col = 0; col < columns; col++) {
-            const seatDiv = document.createElement('div');
+    let i = 0;
+    var rowDiv = null;
+    while (i < seatlist.length){
+        if (i % columns == 0){
+            rowDiv = document.createElement('div');
+            rowDiv.classList.add('row');
+        }
+        const seatDiv = document.createElement('div');
+        if (seatlist[i] === ''){
             seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
-            seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
-            seatDiv.innerText = ``;
-            rowDiv.appendChild(seatDiv);
+        } else {
+            console.log('seat: ' +  seatlist[i]);
+            seatDiv.classList.add('seat', 'unoccupied');
+            seatDiv.classList.add('unselectable');
+            seatDiv.innerText = seatlist[i];
         }
-        seatingPlanContainer.appendChild(rowDiv);
+        rowDiv.appendChild(seatDiv);
+        i += 1;
+        if (i % columns == 0){
+            seatingPlanContainer.appendChild(rowDiv);
+        }
     }
 }
 
