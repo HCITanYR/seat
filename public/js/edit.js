@@ -29,16 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     var designweusing = designs['designs'][design];
     name = designweusing['name'];
     historyIndex = designweusing['histindex'];
-    for (const item of designweusing['data']) {
-        history.push(item);
-    }
+    console.log('retrieved hist index:' + historyIndex);
+    history = designweusing['data'];
     if (history.length == 0) {
         updateSeatingPlan();
         saveState();
     } else {
-        seatlist = history[historyIndex].seatingPlan;
-        rows = history[historyIndex].rows;
-        columns = history[historyIndex].cols;
         applyState(history[historyIndex]);
     }
     document.getElementById('designtitle').innerHTML = name;
@@ -254,6 +250,7 @@ function saveState() {
         rows: rows,
         cols: columns,
     };
+    //new state, nothing wrong.
     history.push(state);
     historyIndex++;
     updateDraggableSeats();
@@ -269,8 +266,10 @@ function applyState(state) {
         Students.forEach(student => {
             appendStudent(student);
         });
-        document.getElementById('layout-rows').value = state.rows;
-        document.getElementById('layout-columns').value = state.cols;
+        rows = state['rows'];
+        columns = state['cols'];
+        document.getElementById('layout-rows').value = rows;
+        document.getElementById('layout-columns').value = columns;
         attachEventListeners();
         updateDraggableSeats();
         update(design, name, history, designs, historyIndex, uid);
@@ -315,9 +314,6 @@ document.addEventListener('keydown', function (e) {
         redo();
     }
 });
-
-document.getElementById('add-row').addEventListener('click', addRow);
-
 document.querySelectorAll('.add-row').forEach(element => {
     element.addEventListener('click', addRow);
   }
@@ -328,16 +324,15 @@ document.querySelectorAll('.add-column').forEach(element => {
   }
 );
 
-
-document.getElementById('add-column').addEventListener('click', addColumn);
-
 // Add a new row
 function addRow() {
     let i = 0;
+    console.log(seatlist.length);
     while (i < columns){
         seatlist.push('');
         i++;
     }
+    console.log(seatlist.length);
     const rowsInput = document.getElementById('layout-rows');
     rowsInput.value = parseInt(rowsInput.value) + 1;
     rows += 1;
@@ -370,12 +365,12 @@ function addColumn() {
 
 //   seating plan
 function updateSeatingPlan() {
+    console.log('length:', seatlist.length, 'columns:', columns, 'rows: ', rows);
     const seatingPlanContainer = document.getElementById('seating-plan'); // Number of columns
-
     // Clear the existing seating plan
     seatingPlanContainer.innerHTML = '';
     let i = 0;
-    var rowDiv = null;
+    let rowDiv = null;
     while (i < seatlist.length){
         if (i % columns == 0){
             rowDiv = document.createElement('div');
