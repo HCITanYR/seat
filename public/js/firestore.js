@@ -24,7 +24,6 @@ async function setup(){
     if (!docSnap.exists()) {
         try {
             await setDoc(docRef, docData);
-            console.log(`Document written with ID: ${docRef.id}`);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
@@ -43,12 +42,10 @@ export async function add(name, data){
             await setDoc(docRef, designs);
             const index = designs['designs'].length - 1;
             window.location.href = '/designs/' + getUid() + '?d=' + index;
-            console.log('success creating design, redirecting to edit.html?d=' + index);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
     } else {
-        console.log('document does not exist');
     }
 }
 
@@ -64,7 +61,6 @@ export async function getDesigns(uid){
     const docRef = doc(designsRef, uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        console.log(docSnap.data());
         return docSnap.data();
     } else {
         if (window.location.pathname !== '/') {
@@ -93,7 +89,6 @@ function addDesignCard(name, index){
 }
 
 export async function loadDesigns() {
-    console.log('im trying to load designs');
     await getDesigns(getUid()).then(data => {
         if (data['designs'].length > 0) {
             data.designs.sort((a, b) => b.lastModified - a.lastModified);
