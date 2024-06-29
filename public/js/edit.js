@@ -254,12 +254,19 @@ document.getElementById('pan').addEventListener('click', function() {
 async function saveState() {
     console.log('before saving state');
     printouteverything(history);
+    var names = [];
+    Array.from(document.getElementById('seating-plan').children).forEach(row => {
+        Array.from(row.children).forEach(seat => {
+            names.push(seat.innerText);
+        });
+    });
     const state = {
         students: JSON.stringify(Students),
-        seatingPlan: JSON.stringify(seatlist),
+        seatingPlan: JSON.stringify(names),
         rows: rows,
         cols: columns,
     };
+    
     //new state, nothing wrong.
     history.push(state);
     console.log('after saving state');
@@ -398,7 +405,7 @@ function updateSeatingPlan() {
             seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
         } else {
-            seatDiv.classList.add('seat', 'unoccupied');
+            seatDiv.classList.add('seat', 'occupied');
             seatDiv.classList.add('unselectable');
             seatDiv.innerText = seatlist[i];
         }
