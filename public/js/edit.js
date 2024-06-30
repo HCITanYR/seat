@@ -30,10 +30,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     name = designweusing['name'];
     historyIndex = designweusing['histindex'];
     for (const item in designweusing['data']){
-        console.log('item: ', designweusing['data'][item]);
         history.push(designweusing['data'][item]);
     }
-    console.log('retrieved history:' + history); // this is empty
     if (history.length == 0) {
         updateSeatingPlan();
         await saveState();
@@ -42,12 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('designtitle').innerHTML = name;
     document.getElementById('editpage').style.display = 'block';
 });
-
-function printouteverything(list){
-    for (const item in list){
-        console.log(list[item]);
-    }
-}
 
 function updateDraggableSeats() {
     // make the seats draggable AND droppable
@@ -252,25 +244,21 @@ document.getElementById('pan').addEventListener('click', function() {
 });
 
 async function saveState() {
-    console.log('before saving state');
-    printouteverything(history);
-    var names = [];
+    seatlist = [];
     Array.from(document.getElementById('seating-plan').children).forEach(row => {
         Array.from(row.children).forEach(seat => {
-            names.push(seat.innerText);
+            seatlist.push(seat.innerText);
         });
     });
     const state = {
         students: JSON.stringify(Students),
-        seatingPlan: JSON.stringify(names),
+        seatingPlan: JSON.stringify(seatlist),
         rows: rows,
         cols: columns,
     };
     
     //new state, nothing wrong.
     history.push(state);
-    console.log('after saving state');
-    printouteverything(history);
     historyIndex++;
     updateDraggableSeats();
     await update(design, name, history, designs, historyIndex, uid);
@@ -333,31 +321,38 @@ document.addEventListener('keydown', function (e) {
         redo();
     }
 });
+
 document.querySelectorAll('.add-row').forEach(element => {
-    element.addEventListener('click', addRow);
-  }
-);
+    element.addEventListener('click', () => {
+        addRow(element.classList.contains('up')); // Pass in any parameters you need
+    });
+});
 
 document.querySelectorAll('.add-column').forEach(element => {
-    element.addEventListener('click', addColumn);
-  }
-);
+    element.addEventListener('click', () => {
+        addColumn(element.classList.contains('left')); // Pass in any parameters you need
+    });
+});
 
 // Add a new row
-async function addRow() {
+async function addRow(up) {
     let i = 0;
-    console.log('before adding row');
-    printouteverything(history);
-    console.log(seatlist.length);
-    while (i < columns){
-        seatlist.push('');
-        i++;
-        console.log('adding row');
-        printouteverything(history);
+    let temp = [];
+    let x = JSON.parse(JSON.stringify(seatlist));
+    if (up) {
+        while (i < columns){
+            temp.push('');
+            i++;
+        }
+        temp = temp.concat(x);
+    } else {
+        temp = x;
+        while (i < columns){
+            temp.push('');
+            i++;
+        }
     }
-    console.log('after adding row');
-    printouteverything(history);
-    console.log(seatlist.length);
+    seatlist = JSON.parse(JSON.stringify(temp));
     const rowsInput = document.getElementById('layout-rows');
     rowsInput.value = parseInt(rowsInput.value) + 1;
     rows += 1;
@@ -366,19 +361,29 @@ async function addRow() {
 }
 
 // Add a new column
-async function addColumn() {
-    //columns ++;
+async function addColumn(left) {
     let i = 0;
     let temp = [];
-    // loop through n columns, add, add to list continue.
-    while (i < seatlist.length) {
-        temp.push(seatlist[i]);
-        i += 1;
-        if((i+1) % columns == 0){
-            temp.push('');
+    if (left) {
+        while (i < seatlist.length) {
+            if((i) % columns == 0){
+                temp.push('');
+            }
+            temp.push(seatlist[i]);
+            i += 1;
+        }
+    } else {
+        while (i < seatlist.length) {
+            temp.push(seatlist[i]);
+            i += 1;
+            if((i+1) % columns == 0){
+                temp.push('');
+            }
         }
     }
-    seatlist = temp;
+    // loop through n columns, add, add to list continue.
+    
+    seatlist = JSON.parse(JSON.stringify(temp));
     const columnsInput = document.getElementById('layout-columns');
     columnsInput.value = parseInt(columnsInput.value) + 1;
     columns += 1;
