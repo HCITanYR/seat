@@ -5,8 +5,10 @@ const urlParams = new URLSearchParams(window.location.search);
 const design = urlParams.get('d');
 var currentUrl = window.location.href;
 var urlSegments = currentUrl.split('/');
-var uid = urlSegments[4].split('?')[0]; // 'ghjk'
+var uid = urlSegments[4].split('?')[0];
+var Students = [];
 
+var seatlist = ['','','',''];
 var designs = null;
 var rows = 2;
 var columns = 2;
@@ -24,29 +26,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         //redirect home
         window.location.href = '/';
     }
-    try {
-        var designweusing = designs['designs'][design];
-        name = designweusing['name'];
-        historyIndex = designweusing['histindex'];
-        console.log(historyIndex);
-    } catch(e) {   
-        //
-    }
-    document.getElementById('designtitle').innerHTML = name;
-    for (const item of designweusing['data']) {
-        history.push(item);
+    var designweusing = designs['designs'][design];
+    name = designweusing['name'];
+    historyIndex = designweusing['histindex'];
+    for (const item in designweusing['data']){
+        history.push(designweusing['data'][item]);
     }
     if (history.length == 0) {
         updateSeatingPlan();
-        saveState();
-    }
-    try {
-        rows = history[historyIndex].rows;
-        columns = history[historyIndex].cols;
-    } catch(e) {
-        //idgaf
+        await saveState();
     }
     applyState(history[historyIndex]);
+    document.getElementById('designtitle').innerHTML = name;
     document.getElementById('editpage').style.display = 'block';
 });
 
@@ -91,7 +82,7 @@ function seatDragLeave(e) {
     }
 }
 
-function seatDrop(e) {
+async function seatDrop(e) {
     e.preventDefault();
     const studentName = e.dataTransfer.getData('text/plain');
     const targetSeat = e.target;
@@ -126,7 +117,7 @@ function seatDrop(e) {
         targetSeat.innerText = studentName; // set the student's name to the new seat
         targetSeat.classList.remove('unoccupied');
         targetSeat.classList.add('occupied'); // mark the new seat as occupied
-        saveState();
+        await saveState();
     } else if (targetSeat.classList.contains('occupied')) {
         // target seat already occupied
         if (targetSeat.innerText == studentName) {
@@ -138,7 +129,7 @@ function seatDrop(e) {
                 existingSeat.innerText = targetSeat.innerText; // swap the existing seat with target
             }
             targetSeat.innerText = studentName; // replace target
-            saveState();
+            await saveState();
         }
     }
 }
@@ -252,60 +243,59 @@ document.getElementById('pan').addEventListener('click', function() {
     this.classList.toggle('btn-outline-secondary');
 });
 
-
-// History state management
-
-
-function saveState() {
-    console.log('saving state');
+async function saveState() {
+    seatlist = [];
+    Array.from(document.getElementById('seating-plan').children).forEach(row => {
+        Array.from(row.children).forEach(seat => {
+            seatlist.push(seat.innerText);
+        });
+    });
     const state = {
-        students: document.getElementById('students-list').innerHTML,
-        seatingPlan: document.getElementById('seating-plan').innerHTML,
+        students: JSON.stringify(Students),
+        seatingPlan: JSON.stringify(seatlist),
         rows: rows,
         cols: columns,
     };
-    if (historyIndex < history.length - 1) {
-        history.splice(historyIndex + 1);
-    }
+    
+    //new state, nothing wrong.
     history.push(state);
-    if (history.length > 255) {
-        history.shift();
-    } else {
-        historyIndex++;
-    }
+    historyIndex++;
     updateDraggableSeats();
-    update(design, name, history, designs, historyIndex);
+    await update(design, name, history, designs, historyIndex, uid);
 }
 
-function applyState(state) {
+async function applyState(state) {
     if (historyIndex > -1) {
-        document.getElementById('students-list').innerHTML = state.students;
-        document.getElementById('seating-plan').innerHTML = state.seatingPlan;
-        document.getElementById('layout-rows').value = state.rows;
-        document.getElementById('layout-columns').value = state.cols;
+        // document.getElementById('students-list').innerHTML = state.students;
+        seatlist = JSON.parse(state.seatingPlan);
+        Students = JSON.parse(state.students);
+        document.getElementById('students-list').innerHTML = '';
+        Students.forEach(student => {
+            appendStudent(student);
+        });
+        rows = state['rows'];
+        columns = state['cols'];
+        document.getElementById('layout-rows').value = rows;
+        document.getElementById('layout-columns').value = columns;
         attachEventListeners();
         updateDraggableSeats();
-        update(design, name, history, designs, historyIndex);
+        updateSeatingPlan();
+        await update(design, name, history, designs, historyIndex, uid);
     }
 }
 
-function undo() {
-    console.log('undo');
+async function undo() {
     if (historyIndex > 0) {
-        console.log('undo success');
         historyIndex--;
-        applyState(history[historyIndex]);
+        await applyState(history[historyIndex]);
         updateDraggableSeats();
     }
 }
 
-function redo() {
-    console.log('redo');
-    console.log(historyIndex, history.length);
+async function redo() {
     if (historyIndex < history.length - 1) {
-        console.log('redo success');
         historyIndex++;
-        applyState(history[historyIndex]);
+        await applyState(history[historyIndex]);
         updateDraggableSeats();
     }
 }
@@ -332,53 +322,103 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-document.getElementById('add-row').addEventListener('click', addRow);
+document.querySelectorAll('.add-row').forEach(element => {
+    element.addEventListener('click', () => {
+        addRow(element.classList.contains('up')); // Pass in any parameters you need
+    });
+});
 
-document.getElementById('add-column').addEventListener('click', addColumn);
+document.querySelectorAll('.add-column').forEach(element => {
+    element.addEventListener('click', () => {
+        addColumn(element.classList.contains('left')); // Pass in any parameters you need
+    });
+});
 
 // Add a new row
-function addRow() {
+async function addRow(up) {
+    let i = 0;
+    let temp = [];
+    let x = JSON.parse(JSON.stringify(seatlist));
+    if (up) {
+        while (i < columns){
+            temp.push('');
+            i++;
+        }
+        temp = temp.concat(x);
+    } else {
+        temp = x;
+        while (i < columns){
+            temp.push('');
+            i++;
+        }
+    }
+    seatlist = JSON.parse(JSON.stringify(temp));
     const rowsInput = document.getElementById('layout-rows');
     rowsInput.value = parseInt(rowsInput.value) + 1;
     rows += 1;
     updateSeatingPlan();
-    
-    saveState(); // Save the new seating plan state
+    await saveState(); // Save the new seating plan state
 }
 
 // Add a new column
-function addColumn() {
+async function addColumn(left) {
+    let i = 0;
+    let temp = [];
+    if (left) {
+        while (i < seatlist.length) {
+            if((i) % columns == 0){
+                temp.push('');
+            }
+            temp.push(seatlist[i]);
+            i += 1;
+        }
+    } else {
+        while (i < seatlist.length) {
+            temp.push(seatlist[i]);
+            i += 1;
+            if((i+1) % columns == 0){
+                temp.push('');
+            }
+        }
+    }
+    // loop through n columns, add, add to list continue.
+    
+    seatlist = JSON.parse(JSON.stringify(temp));
     const columnsInput = document.getElementById('layout-columns');
     columnsInput.value = parseInt(columnsInput.value) + 1;
     columns += 1;
     updateSeatingPlan();
-    
-    saveState(); // Save the new seating plan state
+    await saveState(); // Save the new seating plan state
 }
 
 
 
 //   seating plan
 function updateSeatingPlan() {
-    console.log('updating seating plan');
     const seatingPlanContainer = document.getElementById('seating-plan'); // Number of columns
-
     // Clear the existing seating plan
     seatingPlanContainer.innerHTML = '';
-
-    // Generate new seating plan based on rows and columns input
-    for (let row = 0; row < rows; row++) {
-        const rowDiv = document.createElement('div');
-        rowDiv.classList.add('row');
-        for (let col = 0; col < columns; col++) {
-            const seatDiv = document.createElement('div');
+    let i = 0;
+    let rowDiv = null;
+    while (i < seatlist.length){
+        if (i % columns == 0){
+            rowDiv = document.createElement('div');
+            rowDiv.classList.add('row');
+        }
+        const seatDiv = document.createElement('div');
+        if (seatlist[i] === ''){
             seatDiv.classList.add('seat', 'unoccupied');
             seatDiv.classList.add('unselectable');
-            seatDiv.dataset.seat = `${row + 1}-${String.fromCharCode(65 + col)}`; // Label seats as 1-A, 1-B, etc.
-            seatDiv.innerText = ``;
-            rowDiv.appendChild(seatDiv);
+        } else {
+            seatDiv.classList.add('seat', 'occupied');
+            seatDiv.classList.add('unselectable');
+            seatDiv.innerText = seatlist[i];
         }
-        seatingPlanContainer.appendChild(rowDiv);
+        rowDiv.appendChild(seatDiv);
+        i += 1;
+        if (i % columns == 0){
+            seatingPlanContainer.appendChild(rowDiv);
+        }
     }
 }
 
@@ -388,10 +428,11 @@ function addDeleteButton(student) {
     var deleteBtn = document.createElement('span');
     deleteBtn.className = 'delete-btn';
     deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteBtn.addEventListener('click', function () {
+    deleteBtn.addEventListener('click', async function () {
         student.remove(); // remove student from list
 
         var studentName = student.innerText;
+        Students = Students.filter(name => name !== studentName); // remove student from array
         // find if the student is already seated 
         const allSeats = document.querySelectorAll('.seat');
         allSeats.forEach(seat => {
@@ -402,7 +443,7 @@ function addDeleteButton(student) {
             }
         });
 
-        saveState(); // Save state after deleting a student
+        await saveState(); // Save state after deleting a student
     });
     student.appendChild(deleteBtn);
 }
@@ -427,7 +468,7 @@ function addEditEventListener(student) {
         e.target.appendChild(input);
         input.focus();
 
-        function handleInput(e) {
+        async function handleInput(e) {
             var newName = e.target.value.trim();
 
             if (newName && newName !== originalName) {
@@ -435,19 +476,19 @@ function addEditEventListener(student) {
                 var studentList = document.getElementById('students-list');
                 var students = Array.from(studentList.getElementsByClassName('student'));
                 var names = students.map(student => student.textContent);
-
                 if (names.includes(newName)) {
                     // Show the error modal
                     $('#errorModal').modal('show');
                     e.target.parentElement.textContent = originalName; // Revert to the original name
                 } else {
                     e.target.parentElement.textContent = newName;
-                    saveState(); // Save state after editing a student name
+                    Students[Students.indexOf(originalName)] = newName;
+                    await saveState(); // Save state after editing a student name
                 }
             } else {
                 e.target.parentElement.textContent = originalName;
             }
-            addDeleteButton(student); // re-add delete button after editing
+            addDeleteButton(student, Students, seatlist, rows, columns); // re-add delete button after editing
         }
 
         input.addEventListener('blur', handleInput);
@@ -462,7 +503,7 @@ function addEditEventListener(student) {
 }
 
 // Adding new student
-document.getElementById('new-student').addEventListener('keypress', function (e) {
+document.getElementById('new-student').addEventListener('keypress', async function (e) {
     if (e.key === 'Enter') {
         var studentName = e.target.value;
         var studentList = document.getElementById('students-list');
@@ -474,28 +515,35 @@ document.getElementById('new-student').addEventListener('keypress', function (e)
             if (names.includes(studentName)) {
                 errorMessage.textContent = 'Error: Student name already exists!';
             } else {
-                var newStudent = document.createElement('div');
-                var name = document.createElement('span');
-                name.textContent = studentName;
-                newStudent.className = 'student';
-                newStudent.appendChild(name);
-                addDeleteButton(newStudent); // Add delete button to new student
-                studentList.appendChild(newStudent);
-                e.target.value = '';
-                addEditEventListener(name);
-                saveState(); // Save state after adding a student
+                appendStudent(studentName, e);
+                Students.push(studentName);
+                await saveState(); // Save state after adding a student
             }
         }
         e.preventDefault(); // Prevent form submission
     }
 });
 
+function appendStudent(studentName, e=null) {
+    var newStudent = document.createElement('div');
+    var name = document.createElement('span');
+    name.textContent = studentName;
+    newStudent.className = 'student';
+    newStudent.appendChild(name);
+    addDeleteButton(newStudent); // Add delete button to new student
+    document.getElementById('students-list').appendChild(newStudent);
+    if (e != null){
+        e.target.value = '';
+    }
+    addEditEventListener(name);
+}
+
 // Import from CSV
 document.getElementById('import-btn').addEventListener('click', function () {
     document.getElementById('csv-file').click();
 });
 
-document.getElementById('csv-file').addEventListener('change', function (event) {
+document.getElementById('csv-file').addEventListener('change', async function (event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -536,11 +584,11 @@ document.getElementById('csv-file').addEventListener('change', function (event) 
             $('#table-editor-modal').modal('show');
         };
         reader.readAsText(file);
-        saveState(); // Save state after importing CSV
+        await saveState(); // Save state after importing CSV
     }
 });
 
-document.getElementById('finish-import').addEventListener('click', function () {
+document.getElementById('finish-import').addEventListener('click', async function () {
     const selectedCells = document.querySelectorAll('#csv-table td.selected');
     const studentList = document.getElementById('students-list');
 
@@ -554,7 +602,7 @@ document.getElementById('finish-import').addEventListener('click', function () {
     });
 
     $('#table-editor-modal').modal('hide');
-    saveState(); // Save state after importing students to link with main undo/redo
+    await saveState(); // Save state after importing students to link with main undo/redo
 });
 
 function attachEventListeners() {
