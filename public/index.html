@@ -6,8 +6,10 @@
     <title>Seating Plan Generator</title>
     <script type="module">
         import { add } from './js/firestore.js';
-    
-        document.getElementById('create').addEventListener('click', () => add('new', []));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('create').addEventListener('click', () => add('new', []));
+        });
     </script>
     <script src="js/login.js" type="module"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -33,27 +35,19 @@
             padding: 30px;
             text-align: center;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            transition: background-color 0.3s ease;
         }
         .new-design i {
             font-size: 40px;
             color: #aaa;
         }
-        .hover-darken {
-            position: relative;
-            transition: background-color 0.3s ease;
-        }
-        .hover-darken:hover {
-            background-color: rgba(0, 0, 0, 0.040); /* Adjust the alpha value to control the darkness */
-        }
-        .hover-darken img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .hover-darken p {
-            margin: 0;
-            padding: 10px;
-            text-align: center;
+        .new-design:hover {
+            background-color: rgba(0, 0, 0, 0.040);
         }
     </style>
     <!-- Firebase scripts -->
@@ -90,10 +84,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="new-design">
+                    <a href="https://seat-87c59.firebaseapp.com/templates.html" class="new-design">
                         <i class="fas fa-file-alt"></i>
                         <p>Templates</p>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="new-design">
