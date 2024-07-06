@@ -60,6 +60,7 @@ function updateDraggableSeats() {
 }
 
 function seatDragStart(e) {
+    console.log('drag start');
     e.dataTransfer.setData('text/plain', e.target.innerText);
     e.dataTransfer.effectAllowed = 'move';
 
@@ -69,10 +70,13 @@ function seatDragStart(e) {
 
 function seatDragOver(e) {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move'; // indicate a move operation
 
-    if (e.target.classList.contains('seat') && !e.target.classList.contains('dragging')) {
+    if (e.target.classList.contains('seat') && !e.target.classList.contains('dragging')  && !e.target.classList.contains('empty')) {
         e.target.classList.add('over');
+        e.dataTransfer.dropEffect = 'move'; // indicate a move operation
+    }
+    if (e.target.classList.contains('seat') && !e.target.classList.contains('dragging') && e.target.classList.contains('empty')) {
+        e.dataTransfer.dropEffect = 'none';
     }
 }
 
@@ -247,7 +251,12 @@ async function saveState() {
     seatlist = [];
     Array.from(document.getElementById('seating-plan').children).forEach(row => {
         Array.from(row.children).forEach(seat => {
-            seatlist.push(seat.innerText);
+            if (seat.classList.contains('empty')){
+                seatlist.push(false);
+            } else {
+                seatlist.push(seat.innerText);
+            }
+            
         });
     });
     const state = {
@@ -406,8 +415,8 @@ function updateSeatingPlan() {
             rowDiv.classList.add('row');
         }
         const seatDiv = document.createElement('div');
-        if (seatlist[i] === ''){
-            seatDiv.classList.add('seat', 'unoccupied');
+        if (seatlist[i] === false){
+            seatDiv.classList.add('seat', 'empty');
             seatDiv.classList.add('unselectable');
         } else {
             seatDiv.classList.add('seat', 'occupied');
