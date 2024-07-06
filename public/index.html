@@ -45,27 +45,19 @@
             padding: 30px;
             text-align: center;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            transition: background-color 0.3s ease;
         }
         .new-design i {
             font-size: 40px;
             color: #aaa;
         }
-        .hover-darken {
-            position: relative;
-            transition: background-color 0.3s ease;
-        }
-        .hover-darken:hover {
-            background-color: rgba(0, 0, 0, 0.040); /* Adjust the alpha value to control the darkness */
-        }
-        .hover-darken img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .hover-darken p {
-            margin: 0;
-            padding: 10px;
-            text-align: center;
+        .new-design:hover {
+            background-color: rgba(0, 0, 0, 0.040);
         }
     </style>
     <!-- Firebase scripts -->
@@ -105,7 +97,7 @@
                     <div class="new-design" id="template">
                         <i class="fas fa-file-alt"></i>
                         <p>Templates</p>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="new-design">
