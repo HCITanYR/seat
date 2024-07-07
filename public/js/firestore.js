@@ -91,7 +91,6 @@ function addDesignCard(name, index){
 export async function loadDesigns() {
     await getDesigns(getUid()).then(data => {
         if (data['designs'].length > 0) {
-            data.designs.sort((a, b) => b.lastModified - a.lastModified);
             data.designs.forEach((design, index) => {
                 addDesignCard(design.name, index);
             });
