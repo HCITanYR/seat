@@ -397,6 +397,7 @@ async function addRow(up) {
 async function addColumn(left) {
     let i = 0;
     let temp = [];
+    console.log(left);
     if (left) {
         while (i < seatlist.length) {
             if (i % columns == 0) {
@@ -409,7 +410,7 @@ async function addColumn(left) {
         while (i < seatlist.length) {
             temp.push(seatlist[i]);
             i += 1;
-            if ((i + 1) % columns == 0) {
+            if ((i) % columns == 0) {
                 temp.push("");
             }
         }
@@ -441,9 +442,14 @@ function updateSeatingPlan() {
             seatDiv.classList.add("seat", "empty");
             seatDiv.classList.add("unselectable");
         } else {
-            seatDiv.classList.add("seat", "occupied");
-            seatDiv.classList.add("unselectable");
-            seatDiv.innerText = seatlist[i];
+            if (seatlist[i] === "") {
+                seatDiv.classList.add("seat", "unoccupied");
+                seatDiv.classList.add("unselectable");
+            } else {
+                seatDiv.classList.add("seat", "occupied");
+                seatDiv.classList.add("unselectable");
+                seatDiv.innerText = seatlist[i];
+            }
         }
         rowDiv.appendChild(seatDiv);
         i += 1;
