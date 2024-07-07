@@ -64,10 +64,11 @@ body {
     justify-content: center;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 #zoomable-content {
     overflow: hidden;
-    cursor: move;
+    position: relative;
 }
 .row {
     display: flex;
