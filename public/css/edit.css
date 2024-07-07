@@ -1,151 +1,190 @@
+body {
+    background-color: #ffffff;
+}
+#editpage {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allow it to grow and fill the available height */
+    height: 100vh;
+}
+#menu-bar {
+    height: 4rem;
+    align-items: center;
+}
+#designtitle {
+    cursor: text;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+#designtitle:hover {
+    background-color: #f0f0f0;
+}
+#main-content {
+    display: flex; /* Enable flex layout */
+    max-height: calc(100vh - 4rem); /* Set the max height */
+    overflow: hidden; /* Prevent overflow outside this container */
+}
+#left-section {
+    background-color: lightgrey;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    /* overflow: auto; */
+    width: 25rem; /* Fixed width */
+    min-width: 0; /* Ensure it can shrink below content size in flex context */
+}
+#right-section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+#toolbar {
+    background-color: aliceblue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#bottom-bar {
+    height: 3.5rem;
+}
+/* Center Content Styling */
+.layout-container {
+    display: flex;
+    flex-direction: column; /* Flex direction to allow top, center, and bottom to align vertically */
+    justify-content: space-between; /* Space evenly between top and bottom buttons */
+    flex-grow: 1; /* Allow the layout container to grow and fill the parent height */
+    position: relative;
+}
+.seating-plan {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+#zoomable-content {
+    overflow: hidden;
+    cursor: move;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
 
-        body {
-            background-color: #ffffff;
-        }
+.seat {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+    /* Default background color for empty seats */
+}
+.seat.unoccupied {
+    background-color: #ccc;
+    /* Grey for unoccupied seats */
+}
+.seat.occupied {
+    background-color: #d2a679;
+    /* Background color for occupied seats */
+}
+.seat.empty {
+    background-color: #ccc;
+    opacity: 0;
+    /* Grey for unoccupied seats */
+}
 
-        /* Rotate text 90 degrees */
-        .rotate-text {
-            writing-mode: vertical-rl;
-            /* Rotate text to vertical */
-            transform: rotate(180deg);
-            /* Adjust the text orientation */
-            height: 100%;
-            /* Occupy full height of the container */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            /* Remove default button margins */
-            text-align: center;
-            /* Center text */
-        }
+/* Visual feedback while a seat is being dragged */
+.dragging {
+    opacity: 0.5;
+    /* Make the seat semi-transparent */
+}
 
-        /* Adjust button styles to fill container */
-        .btn-outline-primary.rotate-text {
-            width: auto;
-            /* Let height control the button size */
-            border-radius: 0;
-            /* Square edges */
-            padding: 0.5rem;
-            /* Adjust padding for better text readability */
-        }
+/* Visual feedback for a valid drop target */
+.over {
+    border: 2px dashed grey;
+    /* Add a dashed border to indicate a valid drop target */
+}
 
-        .seating-plan {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-        #zoomable-content {
-            overflow: hidden;
-            cursor: move;
-            height: 500px;
-        }
-        .row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            justify-content: center;
-        }
+.locked {
+    position: relative;
+}
+.locked::before {
+    content: "\f023";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 14px;
+    color: #000;
+}
+.warning {
+    position: relative;
+}
+.warning::before {
+    content: "\f071";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: x;
+    top: 5px;
+    right: 5px;
+    font-size: 14px;
+    color: red;
+}
+.student {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        .seat {
-            width: 100px;
-            height: 100px;
-            margin: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            color: #000;
-            flex-shrink: 0;
-            transition: background-color 0.3s
-            /* Default background color for empty seats */
-        }
-        .seat.unoccupied {
-            background-color: #ccc;
-            /* Grey for unoccupied seats */
-        }
-        .seat.occupied {
-            background-color: #d2a679;
-            /* Background color for occupied seats */
-        }
-        .seat.empty {
-            background-color: #ccc;
-            opacity: 0;
-            /* Grey for unoccupied seats */
-        }
+.delete-btn {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
 
-        /* Visual feedback while a seat is being dragged */
-        .dragging {
-            opacity: 0.5;
-            /* Make the seat semi-transparent */
-        }
+.student:hover .delete-btn {
+    display: inline;
+}
 
-        /* Visual feedback for a valid drop target */
-        .over {
-            border: 2px dashed grey;
-            /* Add a dashed border to indicate a valid drop target */
-        }
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
 
-        .locked {
-            position: relative;
-        }
-        .locked::before {
-            content: '\f023';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 14px;
-            color: #000;
-        }
-        .warning {
-            position: relative;
-        }
-        .warning::before {
-            content: "\f071";
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: x;
-            top: 5px;
-            right: 5px;
-            font-size: 14px;
-            color: red;
-        }
-        .student {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+#csv-table td.selected {
+    background-color: #d1e7dd; /* Light green background for selected cells */
+}
+.unselectable {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
 
-        .delete-btn {
-            display: none;
-            cursor: pointer;
-            position: absolute;
-            right: 5px;
-            top: 5px;
-        }
-
-        .student:hover .delete-btn {
-            display: inline;
-        }
-        
-        .table-responsive {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        #csv-table td.selected {
-            background-color: #d1e7dd; /* Light green background for selected cells */
-        }
-        .unselectable {
-            user-select: none;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-        }
+#help {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    background-color: white;
+    border-color: black;
+    border-width: 2px;
+    border-radius: 25px;
+    font-size: 18px;
+    text-align: center;
+}
