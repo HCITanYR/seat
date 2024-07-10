@@ -146,6 +146,41 @@
         .submit-btn {
             display: none;
         }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .dropdown-select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            z-index: 1;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .dropdown-menu-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-menu-item:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 <body>
@@ -156,25 +191,28 @@
             <div class="form-column">
                 <div class="form-group">
                     <label for="frontRowStudent"><i class="bi bi-tag-fill"></i>Sit in front</label>
-                    <div class="input-container">
-                        <input type="text" id="frontRowStudent">
-                        <button type="button" class="add-btn" onclick="addStudent('front')">+</button>
+                    <div class="dropdown">
+                        <select id="frontRowStudent" class="dropdown-select">
+                            <!-- Dynamically populate options from the edit page -->
+                        </select>
                     </div>
                 </div>
                 <ul id="frontRowList" class="student-list"></ul>
                 <div class="form-group">
                     <label for="backRowStudent"><i class="bi bi-tag-fill"></i>Sit at back</label>
-                    <div class="input-container">
-                        <input type="text" id="backRowStudent">
-                        <button type="button" class="add-btn" onclick="addStudent('back')">+</button>
+                    <div class="dropdown">
+                        <select id="backRowStudent" class="dropdown-select">
+                            <!-- Dynamically populate options from the edit page -->
+                        </select>
                     </div>
                 </div>
                 <ul id="backRowList" class="student-list"></ul>
                 <div class="form-group">
                     <label for="createTag"><i class="bi bi-tag-fill"></i>Create Tag</label>
-                    <div class="input-container">
-                        <input type="text" id="createTag">
-                        <button type="button" class="add-btn" onclick="addStudent('createTag')">+</button>
+                    <div class="dropdown">
+                        <select id="createTag" class="dropdown-select">
+                            <!-- Dynamically populate options from the edit page -->
+                        </select>
                     </div>
                 </div>
                 <ul id="createTagList" class="student-list"></ul>
@@ -182,17 +220,19 @@
             <div class="form-column">
                 <div class="form-group">
                     <label for="separatedStudent"><i class="bi bi-tag-fill"></i>Separate</label>
-                    <div class="input-separate">
-                        <input type="text" id="separatedStudent">
-                        <button type="button" class="add-btn" onclick="addStudent('separated')">+</button>
+                    <div class="dropdown">
+                        <select id="separatedStudent" class="dropdown-select">
+                            <!-- Dynamically populate options from the edit page -->
+                        </select>
                     </div>
                 </div>
                 <ul id="separatedList" class="student-list"></ul>
                 <div class="form-group">
                     <label for="lockedStudent"><i class="bi bi-lock-fill"></i>Lock students</label>
-                    <div class="input-container">
-                        <input type="text" id="lockedStudent">
-                        <button type="button" class="add-btn" onclick="addStudent('locked')">+</button>
+                    <div class="dropdown">
+                        <select id="lockedStudent" class="dropdown-select">
+                            <!-- Dynamically populate options from the edit page -->
+                        </select>
                     </div>
                 </div>
                 <ul id="lockedList" class="student-list"></ul>
@@ -201,10 +241,32 @@
         <button class="submit-btn" onclick="submitSettings()">Submit</button>
     </div>
     <script>
+        // Function to close the settings page
         function closeSettings() {
             window.location.href = 'https://seat-87c59.firebaseapp.com/designs/WGp1nmIbanP4GqLf5Wg1OLiiy1O2?d=1';
         }
 
+        // Function to populate dropdowns with options from the edit page
+        function populateDropdowns() {
+            const students = Array.from(document.getElementById('students-list').children).map(student => student.textContent.trim());
+            const dropdowns = document.querySelectorAll('.dropdown-select');
+            
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = ''; // Clear existing options
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.textContent = student;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        // Call the function to populate dropdowns on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDropdowns();
+        });
+
+        // Function to add selected student to the list
         function addStudent(type) {
             let inputId, listId;
             switch (type) {
@@ -230,26 +292,26 @@
                     break;
             }
 
-            const inputValue = document.getElementById(inputId).value;
-            if (inputValue) {
+            const selectedOption = document.getElementById(inputId).value;
+            if (selectedOption) {
                 const li = document.createElement('li');
-                li.textContent = inputValue;
+                li.textContent = selectedOption;
                 document.getElementById(listId).appendChild(li);
                 document.getElementById(inputId).value = '';
             }
         }
 
+        // Function to submit settings
         function submitSettings() {
             const settings = {
                 frontRowStudents: Array.from(document.getElementById('frontRowList').children).map(li => li.textContent),
                 backRowStudents: Array.from(document.getElementById('backRowList').children).map(li => li.textContent),
                 separatedStudents: Array.from(document.getElementById('separatedList').children).map(li => li.textContent),
                 lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent),
-                createTags: Array.from(document.getElementById('createTagList').children).map(li => li.textContent)
+                tags: Array.from(document.getElementById('createTagList').children).map(li => li.textContent)
             };
 
-            console.log(settings);
-            // Add your logic to handle the settings as needed
+            console.log(settings); // You can process the settings object here as needed
         }
     </script>
 </body>
