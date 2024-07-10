@@ -321,7 +321,10 @@ async function saveState() {
         rows: rows,
         cols: columns,
     };
-
+    if (historyIndex < history.length - 1) {
+        //if we are not at the end of the history array
+        history = history.slice(0, historyIndex + 1); //remove all the states after the current state
+    }
     //new state, nothing wrong.
     history.push(state);
     historyIndex++;
