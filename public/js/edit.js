@@ -268,6 +268,38 @@ document.getElementById("zoom-out").addEventListener("click", function () {
 document.getElementById("pan").addEventListener("click", function () {
     this.classList.toggle("btn-primary");
     this.classList.toggle("btn-outline-secondary");
+        const zoomableContent = document.getElementById('zoomable-content');
+    const seatingPlan = document.querySelector('.seating-plan');
+
+    let isPanning = false;
+    let startingX = 0;
+    let startingY = 0;
+    let translateX = 0;
+    let translateY = 0;
+
+    zoomableContent.addEventListener('mousedown', (e) => {
+        isPanning = true;
+        startingX = e.clientX - translateX;
+        startingY = e.clientY - translateY;
+        zoomableContent.style.cursor = 'grabbing';
+    });
+
+    zoomableContent.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        translateX = e.clientX - startingX;
+        translateY = e.clientY - startingY;
+        seatingPlan.style.transform = `translate(${translateX}px, ${translateY}px)`;
+    });
+
+    zoomableContent.addEventListener('mouseup', () => {
+        isPanning = false;
+        zoomableContent.style.cursor = 'grab';
+    });
+
+    zoomableContent.addEventListener('mouseleave', () => {
+        isPanning = false;
+        zoomableContent.style.cursor = 'grab';
+    });
 });
 
 async function saveState() {
