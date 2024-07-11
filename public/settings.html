@@ -39,6 +39,10 @@
             margin-bottom: 15px;
         }
 
+        #settings{
+            opacity: 0;
+        }
+
         label {
             display: flex;
             align-items: center;
@@ -184,15 +188,16 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="close-btn" onclick="closeSettings()">X</button>
+    <div class="container" id="settings">
+        <button class="close-btn" id='close'>X</button>
         <h1>Settings</h1>
         <form id="settingsForm">
             <div class="form-column">
                 <div class="form-group">
                     <label for="frontRowStudent"><i class="bi bi-tag-fill"></i>Sit in front</label>
                     <div class="dropdown">
-                        <select id="frontRowStudent" class="dropdown-select">
+                        <select id="frontRowStudent" class="dropdown-select" onchange="updateFrontRowRestriction()">
+                            <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
@@ -202,6 +207,7 @@
                     <label for="backRowStudent"><i class="bi bi-tag-fill"></i>Sit at back</label>
                     <div class="dropdown">
                         <select id="backRowStudent" class="dropdown-select">
+                            <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
@@ -211,6 +217,7 @@
                     <label for="createTag"><i class="bi bi-tag-fill"></i>Create Tag</label>
                     <div class="dropdown">
                         <select id="createTag" class="dropdown-select">
+                            <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
@@ -222,6 +229,7 @@
                     <label for="separatedStudent"><i class="bi bi-tag-fill"></i>Separate</label>
                     <div class="dropdown">
                         <select id="separatedStudent" class="dropdown-select">
+                            <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
@@ -231,6 +239,7 @@
                     <label for="lockedStudent"><i class="bi bi-lock-fill"></i>Lock students</label>
                     <div class="dropdown">
                         <select id="lockedStudent" class="dropdown-select">
+                            <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
@@ -238,80 +247,17 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
-        <button class="submit-btn" onclick="submitSettings()">Submit</button>
+        <button class="submit-btn" id='submit'>Submit</button>
     </div>
+    <script type="module" src="../../js/settings.js"></script>
     <script>
-        // Function to close the settings page
-        function closeSettings() {
-            window.location.href = 'https://seat-87c59.firebaseapp.com/designs/WGp1nmIbanP4GqLf5Wg1OLiiy1O2?d=1';
-        }
-
-        // Function to populate dropdowns with options from the edit page
-        function populateDropdowns() {
-            const students = Array.from(document.getElementById('students-list').children).map(student => student.textContent.trim());
-            const dropdowns = document.querySelectorAll('.dropdown-select');
-            
-            dropdowns.forEach(dropdown => {
-                dropdown.innerHTML = ''; // Clear existing options
-                students.forEach(student => {
-                    const option = document.createElement('option');
-                    option.textContent = student;
-                    dropdown.appendChild(option);
-                });
-            });
-        }
-
-        // Call the function to populate dropdowns on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            populateDropdowns();
-        });
-
-        // Function to add selected student to the list
-        function addStudent(type) {
-            let inputId, listId;
-            switch (type) {
-                case 'front':
-                    inputId = 'frontRowStudent';
-                    listId = 'frontRowList';
-                    break;
-                case 'back':
-                    inputId = 'backRowStudent';
-                    listId = 'backRowList';
-                    break;
-                case 'separated':
-                    inputId = 'separatedStudent';
-                    listId = 'separatedList';
-                    break;
-                case 'locked':
-                    inputId = 'lockedStudent';
-                    listId = 'lockedList';
-                    break;
-                case 'createTag':
-                    inputId = 'createTag';
-                    listId = 'createTagList';
-                    break;
+        // Function to update front row restriction in the edit page
+        function updateFrontRowRestriction() {
+            let frontRowStudent = document.getElementById('frontRowStudent').value;
+            let editPage = window.opener;
+            if (editPage) {
+                editPage.restrictFrontRowPlacement(frontRowStudent);
             }
-
-            const selectedOption = document.getElementById(inputId).value;
-            if (selectedOption) {
-                const li = document.createElement('li');
-                li.textContent = selectedOption;
-                document.getElementById(listId).appendChild(li);
-                document.getElementById(inputId).value = '';
-            }
-        }
-
-        // Function to submit settings
-        function submitSettings() {
-            const settings = {
-                frontRowStudents: Array.from(document.getElementById('frontRowList').children).map(li => li.textContent),
-                backRowStudents: Array.from(document.getElementById('backRowList').children).map(li => li.textContent),
-                separatedStudents: Array.from(document.getElementById('separatedList').children).map(li => li.textContent),
-                lockedStudents: Array.from(document.getElementById('lockedList').children).map(li => li.textContent),
-                tags: Array.from(document.getElementById('createTagList').children).map(li => li.textContent)
-            };
-
-            console.log(settings); // You can process the settings object here as needed
         }
     </script>
 </body>

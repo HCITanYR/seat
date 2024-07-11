@@ -38,7 +38,7 @@ export async function add(name, data){
     if (docSnap.exists()) {
         try {
             let designs = docSnap.data();
-            designs['designs'].push({"histindex": 0, "name": name, "data": data, "lastModified": new Date().getTime()});
+            designs['designs'].push({"settings": [], "histindex": 0, "name": name, "data": data, "lastModified": new Date().getTime()});
             await setDoc(docRef, designs);
             const index = designs['designs'].length - 1;
             window.location.href = '/designs/' + getUid() + '?d=' + index;
@@ -49,9 +49,9 @@ export async function add(name, data){
     }
 }
 
-export async function update(index, name, history, designs, hi, uid){
+export async function update(settings, index, name, history, designs, hi, uid){
     var a = designs['designs'];
-    a[index] = {'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()};
+    a[index] = {'settings': settings, 'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()};
     await updateDoc(doc(firestore, 'designs', uid), {'designs': a});
 }
 

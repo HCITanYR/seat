@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/designs/**/settings",
+        "destination": "/settings.html"
+      },
+      {
         "source": "/designs/**",
         "destination": "/edit.html"
       }

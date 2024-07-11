@@ -73,7 +73,8 @@ async function loginCheck(user){
                 // Redirect back to the stored URL
                 window.location.href = redirectUrl;
             } else {
-                document.getElementById("homepage").style.display = "block";
+                document.getElementById("homepage").style.display = "";
+                slideIn('homepage', 500);
                 document.getElementById("loginpage").style.display = "none";
                 updateProfile(user)
                 loadDesigns();
@@ -89,11 +90,36 @@ async function loginCheck(user){
     } else {
         if (window.location.pathname.endsWith('/')) {
             document.getElementById("homepage").style.display = "none";
-            document.getElementById("loginpage").style.display = "block";
+            document.getElementById("loginpage").style.display = "";
         } else {
             // Capture the current URL before redirecting to login
             sessionStorage.setItem('redirectUrl', window.location.href);
             window.location.href = '../';
         }
     }
+}
+
+function slideIn(elementId, duration) {
+    let element = document.getElementById(elementId);
+    element.style.opacity = 0; // Ensure the element is initially hidden
+    element.style.position = 'relative'; // Ensure the element's position can be manipulated
+    element.style.bottom = '-100px'; // Start position off-screen
+
+    let start = +new Date();
+    let tick = function() {
+        let now = +new Date();
+        let timeProgress = (now - start) / duration;
+        if (timeProgress > 1) timeProgress = 1; // Clamp timeProgress to 1
+
+        // Apply quadratic easing
+        let progress = timeProgress < 0.5 ? 2 * timeProgress * timeProgress : -1 + (4 - 2 * timeProgress) * timeProgress;
+
+        element.style.opacity = progress;
+        element.style.bottom = (-100 * (1 - progress)) + 'px'; // Calculate new position based on easing
+
+        if (timeProgress < 1) {
+            (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+        }
+    };
+    tick();
 }

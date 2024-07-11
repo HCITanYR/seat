@@ -1,4 +1,5 @@
 var name = "";
+var settings = [];
 var history = [];
 let historyIndex = -1;
 const urlParams = new URLSearchParams(window.location.search);
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     var designweusing = designs["designs"][design];
     name = designweusing["name"];
+    settings = designweusing["settings"];
     historyIndex = designweusing["histindex"];
     for (const item in designweusing["data"]) {
         history.push(designweusing["data"][item]);
@@ -39,7 +41,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     applyState(history[historyIndex]);
     document.getElementById("designtitle").innerHTML = name;
     document.getElementById("editpage").style.display = "flex";
+    fadeIn("editpage", 1000);
 });
+
+function fadeIn(elementId, duration) {
+    let element = document.getElementById(elementId);
+    element.style.opacity = 0; // Ensure the element is initially hidden
+    let last = +new Date();
+    let tick = function() {
+        element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+        last = +new Date();
+
+        if (+element.style.opacity < 1) {
+            (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+        }
+    };
+    tick();
+}
 
 function updateDraggableSeats() {
     // make the seats draggable AND droppable
@@ -329,7 +347,7 @@ async function saveState() {
     history.push(state);
     historyIndex++;
     updateDraggableSeats();
-    await update(design, name, history, designs, historyIndex, uid);
+    await update(settings, design, name, history, designs, historyIndex, uid);
 }
 
 async function applyState(state) {
@@ -348,7 +366,7 @@ async function applyState(state) {
         attachEventListeners();
         updateDraggableSeats();
         updateSeatingPlan();
-        await update(design, name, history, designs, historyIndex, uid);
+        await update(settings, design, name, history, designs, historyIndex, uid);
     }
 }
 
