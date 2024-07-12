@@ -77,6 +77,7 @@ function addDesignCard(name, index){
     card.className = 'design-card hover-darken';
     const para = document.createElement('p');
     para.innerHTML = name;
+    para.className = 'design-name';
     const image = document.createElement('img');
     image.src = 'https://via.placeholder.com/150';
     card.appendChild(image);

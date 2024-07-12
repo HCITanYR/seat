@@ -15,9 +15,9 @@ body {
     cursor: text;
     transition: background-color 0.3s ease;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    text-align: left;
 }
 #designtitle:hover {
     background-color: #f0f0f0;

@@ -40,6 +40,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     applyState(history[historyIndex]);
     document.getElementById("designtitle").innerHTML = name;
+    document.getElementById("designtitle").addEventListener("blur", async function(e) {
+        if (this.innerText == "") {
+            this.innerText = name;
+        } else {    
+            name = this.innerText;
+            e.preventDefault();
+            await update(settings, design, name, history, designs, historyIndex, uid);
+        }
+    });
+    document.getElementById('designtitle').addEventListener('keydown', (evt) => {
+        if (evt.key === "Enter") {
+            evt.preventDefault();
+        }
+    });
+    
     document.getElementById("editpage").style.display = "flex";
     fadeIn("editpage", 1000);
 });
