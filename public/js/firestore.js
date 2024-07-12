@@ -1,3 +1,6 @@
+var deleteOptionClicked = false;
+var del = -1;
+
 import { initializeFirestore, CACHE_SIZE_UNLIMITED, doc, setDoc, addDoc, getDoc, collection, updateDoc } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js';
 import { getUid, setUid } from './uid.js';
@@ -86,6 +89,33 @@ function addDesignCard(name, index){
     col.addEventListener('click', () => {
         window.location.href = '/designs/' + getUid() + '?d=' + index;
     });
+    col.addEventListener('contextmenu', function (e) {
+        del = index;  
+        const deleteOption = document.getElementById('delete-option');
+        deleteOption.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+        e.preventDefault();
+        deleteOption.style.display = 'block';
+        deleteOption.style.left = e.pageX + 'px';
+        deleteOption.style.top = e.pageY + 'px';
+    });
+    document.addEventListener('click', function (e) {
+        const deleteOption = document.getElementById('delete-option');
+        console.log('click');
+        if (deleteOptionClicked) { // Step 3: Check the flag
+            deleteOptionClicked = false; // Reset the flag
+            return; // Return early
+        }
+        if (e.target.id === 'delete-option') {
+            e.stopPropagation();
+            deleteOptionClicked = true;
+            // Add your delete logic here
+            alert('WIP Delete design ' + del);
+        }
+        deleteOption.style.display = 'none';
+    });
+    
     document.getElementById('designRow').appendChild(col);
 }
 
