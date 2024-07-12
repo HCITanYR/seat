@@ -715,3 +715,24 @@ function attachEventListeners() {
 }
 
 attachEventListeners();
+
+document.getElementById('generate').addEventListener('click', async function() {
+    console.log(Students);
+    if (Students.length != 0){
+        var temp = [];
+        for (var i = 0; i < seatlist.length; i++) {
+            if (JSON.parse(JSON.stringify(seatlist[i])) !== false){
+                if (Students.length - 1 >= i){
+                    temp.push(Students[i]);
+                } else {
+                    temp.push("");
+                }
+            } else {
+                i -= 1;
+            }
+        }
+    }
+    seatlist = JSON.parse(JSON.stringify(temp));
+    updateSeatingPlan();
+    await saveState();
+});
