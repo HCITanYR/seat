@@ -185,6 +185,21 @@
         .dropdown-menu-item:hover {
             background-color: #ddd;
         }
+        .save-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -247,18 +262,48 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
-        <button class="submit-btn" id='submit'>Submit</button>
+        <button class="save-btn" onclick="saveAllSelectedStudents(); redirectToMainSite();">Save</button>
     </div>
     <script type="module" src="../../js/settings.js"></script>
     <script>
-        // Function to update front row restriction in the edit page
-        function updateFrontRowRestriction() {
-            let frontRowStudent = document.getElementById('frontRowStudent').value;
-            let editPage = window.opener;
-            if (editPage) {
-                editPage.restrictFrontRowPlacement(frontRowStudent);
-            }
+        // Function to save selected student for a category using localStorage
+        function saveSelectedStudent(category, studentName) {
+            localStorage.setItem(category, studentName);
         }
+
+        // Function to retrieve selected student from localStorage for a category
+        function getSelectedStudent(category) {
+            return localStorage.getItem(category);
+        }
+
+        // Function to save all selected students for each category
+        function saveAllSelectedStudents() {
+            saveSelectedStudent('frontRow', document.getElementById('frontRowStudent').value);
+            saveSelectedStudent('backRow', document.getElementById('backRowStudent').value);
+            saveSelectedStudent('createTag', document.getElementById('createTag').value);
+            saveSelectedStudent('separated', document.getElementById('separatedStudent').value);
+            saveSelectedStudent('locked', document.getElementById('lockedStudent').value);
+
+            // Optionally, you can add a confirmation or notification that saving was successful
+            alert('Saved all selected students.');
+        }
+
+        // Function to redirect to the main site without '/settings' path
+        function redirectToMainSite() {
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.split('/settings')[0];
+            console.log('Redirecting to:', baseUrl);
+            window.location.href = baseUrl;
+        }
+
+        // Optional: Populate dropdowns with saved values on page load
+        window.onload = function() {
+            document.getElementById('frontRowStudent').value = getSelectedStudent('frontRow') || '';
+            document.getElementById('backRowStudent').value = getSelectedStudent('backRow') || '';
+            document.getElementById('createTag').value = getSelectedStudent('createTag') || '';
+            document.getElementById('separatedStudent').value = getSelectedStudent('separated') || '';
+            document.getElementById('lockedStudent').value = getSelectedStudent('locked') || '';
+        };
     </script>
 </body>
 </html>

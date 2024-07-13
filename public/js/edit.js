@@ -154,6 +154,14 @@ async function seatDrop(e) {
         }
     });
 
+    // Check if the target seat is in the front row
+    const isInFrontRow = targetSeat.parentElement.classList.contains("front-row");
+
+    if (!isInFrontRow && targetSeat.classList.contains("occupied")) {
+        // If not in the front row and the seat is occupied
+        return; // Prevent dropping students in non-front row occupied seats
+    }
+
     if (targetSeat.classList.contains("unoccupied")) {
         // if empty seat
         if (existingSeat) {
