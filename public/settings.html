@@ -262,19 +262,22 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
-        <button class="save-btn" onclick="saveAllSelectedStudents(); redirectToMainSite();">Save</button>
+        <button class="save-btn" onclick="saveAllSelectedStudents(); closeSettings(); ">Save</button>
     </div>
     <script type="module" src="../../js/settings.js"></script>
     <script>
         // Function to save selected student for a category using localStorage
         function saveSelectedStudent(category, studentName) {
             localStorage.setItem(category, studentName);
+           
         }
+
 
         // Function to retrieve selected student from localStorage for a category
         function getSelectedStudent(category) {
             return localStorage.getItem(category);
         }
+
 
         // Function to save all selected students for each category
         function saveAllSelectedStudents() {
@@ -284,17 +287,17 @@
             saveSelectedStudent('separated', document.getElementById('separatedStudent').value);
             saveSelectedStudent('locked', document.getElementById('lockedStudent').value);
 
+
             // Optionally, you can add a confirmation or notification that saving was successful
             alert('Saved all selected students.');
         }
 
+
         // Function to redirect to the main site without '/settings' path
-        function redirectToMainSite() {
-            const currentUrl = window.location.href;
-            const baseUrl = currentUrl.split('/settings')[0];
-            console.log('Redirecting to:', baseUrl);
-            window.location.href = baseUrl;
+        function closeSettings() {
+            window.location.href = window.location.href.replace('/settings', '');
         }
+
 
         // Optional: Populate dropdowns with saved values on page load
         window.onload = function() {
@@ -307,3 +310,5 @@
     </script>
 </body>
 </html>
+
+
