@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -262,53 +261,62 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
-        <button class="save-btn" onclick="saveAllSelectedStudents(); closeSettings(); ">Save</button>
+        <button class="save-btn" onclick="saveAllSelectedStudents(); closeSettings()">Save</button>
     </div>
     <script type="module" src="../../js/settings.js"></script>
     <script>
+        function closeSettings() {
+            window.location.href = window.location.href.replace("/settings", "");
+        }
+
+        // Object to hold the settings
+        const seatingPlan = {
+            front: [],
+            back: [],
+            createTag: [],
+            separated: [],
+            locked: []
+        };
+
         // Function to save selected student for a category using localStorage
         function saveSelectedStudent(category, studentName) {
-            localStorage.setItem(category, studentName);
-           
+            if (studentName) {
+                seatingPlan[category].push(studentName);
+            }
         }
-
-
-        // Function to retrieve selected student from localStorage for a category
-        function getSelectedStudent(category) {
-            return localStorage.getItem(category);
-        }
-
 
         // Function to save all selected students for each category
         function saveAllSelectedStudents() {
-            saveSelectedStudent('frontRow', document.getElementById('frontRowStudent').value);
-            saveSelectedStudent('backRow', document.getElementById('backRowStudent').value);
+            // Clear previous selections
+            Object.keys(seatingPlan).forEach(category => seatingPlan[category] = []);
+
+            saveSelectedStudent('front', document.getElementById('frontRowStudent').value);
+            saveSelectedStudent('back', document.getElementById('backRowStudent').value);
             saveSelectedStudent('createTag', document.getElementById('createTag').value);
             saveSelectedStudent('separated', document.getElementById('separatedStudent').value);
             saveSelectedStudent('locked', document.getElementById('lockedStudent').value);
 
+            // Save the seatingPlan object to localStorage
+            localStorage.setItem('seatingPlan', JSON.stringify(seatingPlan));
 
             // Optionally, you can add a confirmation or notification that saving was successful
             alert('Saved all selected students.');
         }
 
+        // Function to load saved settings from localStorage
+        function loadSettings() {
+            const savedPlan = JSON.parse(localStorage.getItem('seatingPlan')) || seatingPlan;
 
-        // Function to redirect to the main site without '/settings' path
-        function closeSettings() {
-            window.location.href = window.location.href.replace('/settings', '');
+            // Populate the dropdowns with the saved values
+            document.getElementById('frontRowStudent').value = savedPlan.front[0] || "";
+            document.getElementById('backRowStudent').value = savedPlan.back[0] || "";
+            document.getElementById('createTag').value = savedPlan.createTag[0] || "";
+            document.getElementById('separatedStudent').value = savedPlan.separated[0] || "";
+            document.getElementById('lockedStudent').value = savedPlan.locked[0] || "";
         }
 
-
-        // Optional: Populate dropdowns with saved values on page load
-        window.onload = function() {
-            document.getElementById('frontRowStudent').value = getSelectedStudent('frontRow') || '';
-            document.getElementById('backRowStudent').value = getSelectedStudent('backRow') || '';
-            document.getElementById('createTag').value = getSelectedStudent('createTag') || '';
-            document.getElementById('separatedStudent').value = getSelectedStudent('separated') || '';
-            document.getElementById('lockedStudent').value = getSelectedStudent('locked') || '';
-        };
+        // Load settings when the page loads
+        window.onload = loadSettings;
     </script>
 </body>
 </html>
-
-
