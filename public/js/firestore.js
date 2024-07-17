@@ -41,7 +41,7 @@ export async function add(name, data){
     if (docSnap.exists()) {
         try {
             let designs = docSnap.data();
-            designs['designs'].push({"settings": [], "histindex": 0, "name": name, "data": data, "lastModified": new Date().getTime()});
+            designs['designs'].push({"settings": {'front':[],'back':[],'separate':[],'lock':[]}, "histindex": 0, "name": name, "data": data, "lastModified": new Date().getTime()});
             await setDoc(docRef, designs);
             const index = designs['designs'].length - 1;
             window.location.href = '/designs/' + getUid() + '?d=' + index;

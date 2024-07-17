@@ -210,7 +210,7 @@
                 <div class="form-group">
                     <label for="frontRowStudent"><i class="bi bi-tag-fill"></i>Sit in front</label>
                     <div class="dropdown">
-                        <select id="frontRowStudent" class="dropdown-select" onchange="updateFrontRowRestriction()">
+                        <select id="frontRowStudent" class="dropdown-select" multiple>
                             <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
@@ -220,29 +220,20 @@
                 <div class="form-group">
                     <label for="backRowStudent"><i class="bi bi-tag-fill"></i>Sit at back</label>
                     <div class="dropdown">
-                        <select id="backRowStudent" class="dropdown-select">
+                        <select id="backRowStudent" class="dropdown-select" multiple>
                             <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
                     </div>
                 </div>
                 <ul id="backRowList" class="student-list"></ul>
-                <div class="form-group">
-                    <label for="createTag"><i class="bi bi-tag-fill"></i>Create Tag</label>
-                    <div class="dropdown">
-                        <select id="createTag" class="dropdown-select">
-                            <option value="">Select a student...</option>
-                            <!-- Dynamically populate options from the edit page -->
-                        </select>
-                    </div>
-                </div>
                 <ul id="createTagList" class="student-list"></ul>
             </div>
             <div class="form-column">
                 <div class="form-group">
                     <label for="separatedStudent"><i class="bi bi-tag-fill"></i>Separate</label>
                     <div class="dropdown">
-                        <select id="separatedStudent" class="dropdown-select">
+                        <select id="separatedStudent" class="dropdown-select" multiple>
                             <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
@@ -252,7 +243,7 @@
                 <div class="form-group">
                     <label for="lockedStudent"><i class="bi bi-lock-fill"></i>Lock students</label>
                     <div class="dropdown">
-                        <select id="lockedStudent" class="dropdown-select">
+                        <select id="lockedStudent" class="dropdown-select" multiple>
                             <option value="">Select a student...</option>
                             <!-- Dynamically populate options from the edit page -->
                         </select>
@@ -261,62 +252,8 @@
                 <ul id="lockedList" class="student-list"></ul>
             </div>
         </form>
-        <button class="save-btn" onclick="saveAllSelectedStudents(); closeSettings()">Save</button>
+        <button id="submit" class='save-btn'>Save</button>
     </div>
     <script type="module" src="../../js/settings.js"></script>
-    <script>
-        function closeSettings() {
-            window.location.href = window.location.href.replace("/settings", "");
-        }
-
-        // Object to hold the settings
-        const seatingPlan = {
-            front: [],
-            back: [],
-            createTag: [],
-            separated: [],
-            locked: []
-        };
-
-        // Function to save selected student for a category using localStorage
-        function saveSelectedStudent(category, studentName) {
-            if (studentName) {
-                seatingPlan[category].push(studentName);
-            }
-        }
-
-        // Function to save all selected students for each category
-        function saveAllSelectedStudents() {
-            // Clear previous selections
-            Object.keys(seatingPlan).forEach(category => seatingPlan[category] = []);
-
-            saveSelectedStudent('front', document.getElementById('frontRowStudent').value);
-            saveSelectedStudent('back', document.getElementById('backRowStudent').value);
-            saveSelectedStudent('createTag', document.getElementById('createTag').value);
-            saveSelectedStudent('separated', document.getElementById('separatedStudent').value);
-            saveSelectedStudent('locked', document.getElementById('lockedStudent').value);
-
-            // Save the seatingPlan object to localStorage
-            localStorage.setItem('seatingPlan', JSON.stringify(seatingPlan));
-
-            // Optionally, you can add a confirmation or notification that saving was successful
-            alert('Saved all selected students.');
-        }
-
-        // Function to load saved settings from localStorage
-        function loadSettings() {
-            const savedPlan = JSON.parse(localStorage.getItem('seatingPlan')) || seatingPlan;
-
-            // Populate the dropdowns with the saved values
-            document.getElementById('frontRowStudent').value = savedPlan.front[0] || "";
-            document.getElementById('backRowStudent').value = savedPlan.back[0] || "";
-            document.getElementById('createTag').value = savedPlan.createTag[0] || "";
-            document.getElementById('separatedStudent').value = savedPlan.separated[0] || "";
-            document.getElementById('lockedStudent').value = savedPlan.locked[0] || "";
-        }
-
-        // Load settings when the page loads
-        window.onload = loadSettings;
-    </script>
 </body>
 </html>
