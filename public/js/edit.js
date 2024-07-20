@@ -740,18 +740,21 @@ function attachEventListeners() {
 attachEventListeners();
 
 document.getElementById('generate').addEventListener('click', async function() {
-    console.log(Students);
-    if (Students.length != 0){
-        var temp = [];
+    var tempStudents = JSON.parse(JSON.stringify(Students));
+    console.log(tempStudents);
+    var temp = [];
+    const front = settings['front'];
+    for (var i = 0; i < seatlist.length && i < front.length; i++) {
+        console.log(front[i]);
+        temp.push(front[i]);
+        tempStudents.splice(tempStudents.indexOf(front[i]), 1);
+    }
+    if (tempStudents.length != 0){
         for (var i = 0; i < seatlist.length; i++) {
-            if (JSON.parse(JSON.stringify(seatlist[i])) !== false){
-                if (Students.length - 1 >= i){
-                    temp.push(Students[i]);
-                } else {
-                    temp.push("");
-                }
+            if (tempStudents.length - 1 >= i){
+                temp.push(tempStudents[i]);
             } else {
-                i -= 1;
+                temp.push("");
             }
         }
     }
