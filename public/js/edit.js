@@ -745,6 +745,7 @@ document.getElementById('generate').addEventListener('click', async function() {
     var temp = new Array(seatlist.length).fill("");
     const front = settings['front'];
     const back = settings['back'];
+    const separate = settings['separate'];
 
     // Helper function to add students to temp and remove from tempStudents
     function addStudentsToTemp(studentList, startIndex) {
@@ -761,6 +762,54 @@ document.getElementById('generate').addEventListener('click', async function() {
 
     // Add back students to the end of the temp list
     addStudentsToTemp(back, seatlist.length - back.length);
+
+    // Apply separation constraints
+    function applySeparation(separateList) {
+        if (separateList.length === 0) return;
+
+        // Function to calculate distance between two seats
+        function calculateDistance(index1, index2) {
+            let row1 = Math.floor(index1 / seatlist[0].length);
+            let col1 = index1 % seatlist[0].length;
+            let row2 = Math.floor(index2 / seatlist[0].length);
+            let col2 = index2 % seatlist[0].length;
+            return Math.sqrt(Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2));
+        }
+
+        // Randomly assign the first student
+        let firstStudentIndex = Math.floor(Math.random() * temp.length);
+        temp[firstStudentIndex] = separateList[0];
+        tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
+
+        for (let i = 1; i < separateList.length; i++) {
+            let maxDistance = -1;
+            let bestIndex = -1;
+
+            for (let j = 0; j < temp.length; j++) {
+                if (temp[j] === "") {
+                    let minDistance = Infinity;
+                    for (let k = 0; k < temp.length; k++) {
+                        if (temp[k] !== "" && separateList.includes(temp[k])) {
+                            let distance = calculateDistance(j, k);
+                            minDistance = Math.min(minDistance, distance);
+                        }
+                    }
+                    if (minDistance > maxDistance) {
+                        maxDistance = minDistance;
+                        bestIndex = j;
+                    }
+                }
+            }
+
+            if (bestIndex !== -1) {
+                temp[bestIndex] = separateList[i];
+                tempStudents.splice(tempStudents.indexOf(separateList[i]), 1);
+            }
+        }
+    }
+
+    // Apply separation constraints
+    applySeparation(separate);
 
     // Fill remaining seats
     var tempIndex = 0;
