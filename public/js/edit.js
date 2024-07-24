@@ -742,22 +742,38 @@ attachEventListeners();
 document.getElementById('generate').addEventListener('click', async function() {
     var tempStudents = JSON.parse(JSON.stringify(Students));
     console.log(tempStudents);
-    var temp = [];
+    var temp = new Array(seatlist.length).fill("");
     const front = settings['front'];
-    for (var i = 0; i < seatlist.length && i < front.length; i++) {
-        console.log(front[i]);
-        temp.push(front[i]);
-        tempStudents.splice(tempStudents.indexOf(front[i]), 1);
-    }
-    if (tempStudents.length != 0){
-        for (var i = 0; i < seatlist.length; i++) {
-            if (tempStudents.length - 1 >= i){
-                temp.push(tempStudents[i]);
-            } else {
-                temp.push("");
+    const back = settings['back'];
+
+    // Helper function to add students to temp and remove from tempStudents
+    function addStudentsToTemp(studentList, startIndex) {
+        for (var i = 0; i < studentList.length; i++) {
+            if (tempStudents.includes(studentList[i])) {
+                temp[startIndex + i] = studentList[i];
+                tempStudents.splice(tempStudents.indexOf(studentList[i]), 1);
             }
         }
     }
+
+    // Add front students to the beginning of the temp list
+    addStudentsToTemp(front, 0);
+
+    // Add back students to the end of the temp list
+    addStudentsToTemp(back, seatlist.length - back.length);
+
+    // Fill remaining seats
+    var tempIndex = 0;
+    for (var i = 0; i < temp.length; i++) {
+        if (temp[i] === "") {
+            if (tempIndex < tempStudents.length) {
+                temp[i] = tempStudents[tempIndex];
+                tempIndex++;
+            }
+        }
+    }
+
+    // Update the seatlist and save the state
     seatlist = JSON.parse(JSON.stringify(temp));
     updateSeatingPlan();
     await saveState();
