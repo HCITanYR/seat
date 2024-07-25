@@ -52,6 +52,12 @@ export async function add(name, data){
     }
 }
 
+async function remove(index){
+    var designs = await getDesigns(getUid());
+    designs['designs'].splice(index, 1);
+    await updateDoc(doc(firestore, 'designs', getUid()), designs);
+}
+
 export async function update(settings, index, name, history, designs, hi, uid){
     var a = designs['designs'];
     a[index] = {'settings': settings, 'histindex': hi, 'name': name, 'data': history, 'lastModified': new Date().getTime()};
@@ -100,7 +106,7 @@ function addDesignCard(name, index){
         deleteOption.style.left = e.pageX + 'px';
         deleteOption.style.top = e.pageY + 'px';
     });
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', async function (e) {
         const deleteOption = document.getElementById('delete-option');
         console.log('click');
         if (deleteOptionClicked) { // Step 3: Check the flag
@@ -111,7 +117,9 @@ function addDesignCard(name, index){
             e.stopPropagation();
             deleteOptionClicked = true;
             // Add your delete logic here
-            alert('WIP Delete design ' + del);
+            await remove(del);
+            this.location.reload();
+            
         }
         deleteOption.style.display = 'none';
     });

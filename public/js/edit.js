@@ -741,12 +741,24 @@ attachEventListeners();
 
 document.getElementById('generate').addEventListener('click', async function() {
     var tempStudents = JSON.parse(JSON.stringify(Students));
+    
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // Shuffle the tempStudents array
+    shuffleArray(tempStudents);
+
     console.log(tempStudents);
     var temp = new Array(seatlist.length).fill("");
     const front = settings['front'];
     const back = settings['back'];
     const separate = settings['separate'];
 
+    
     // Helper function to add students to temp and remove from tempStudents
     function addStudentsToTemp(studentList, startIndex) {
         for (var i = 0; i < studentList.length; i++) {
