@@ -1,384 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-    />
-    <title>Seating Plan Generator</title>
-    <script src="../../js/login.js" type="module"></script>
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <link
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-        rel="stylesheet"
-    />
-    <link rel="stylesheet" href="../css/edit.css" />
-</head>
-<body>
-    <div id="editpage" style="opacity: 0;">
-        <!-- top menu bar -->
-        <div class="row px-4 py-2 m-0" id="menu-bar">
-            <!-- left column -->
-            <div
-                class="col d-flex justify-content-start p-0"
-                style="width: 50%"
-            >
-                <!-- home button -->
-                <button onclick="window.location.href='/';" class="btn p-0">
-                    <i class="fas fa-home fa-2x"></i>
-                </button>
-                <!-- project title -->
-                <h4 class="ml-3 mt-1" contenteditable="true" id="designtitle">3A3 Seating Plan</h4>
-            </div>
-            <!-- right column -->
-            <div class="col text-right p-0">
-                <div class="d-flex justify-content-end align-items-center">
-                    <!-- sort button -->
-                    <button class="btn p-0 mr-4">
-                        <i class="fas fa-sort-alpha-down fa-2x"></i>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+        <title>Seating Plan Generator</title>
+        <script src="../../js/login.js" type="module"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        />
+        <link
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../css/edit.css" />
+    </head>
+    <body>
+        <div id="editpage" style="opacity: 0">
+            <!-- top menu bar -->
+            <div class="row px-4 py-2 m-0" id="menu-bar">
+                <!-- left column -->
+                <div
+                    class="col d-flex justify-content-start p-0"
+                    style="width: 50%"
+                >
+                    <!-- home button -->
+                    <button onclick="window.location.href='/';" class="btn p-0">
+                        <i class="fas fa-home fa-2x"></i>
                     </button>
-                    <!-- magic button -->
-                    <button class="btn p-0 mr-4" id="generate">
-                        <i class="fas fa-magic fa-2x"></i>
-                    </button>
-                    <!-- settings button -->
-                    <button
-                        onclick="window.location.href = window.location.pathname + '/settings' + window.location.search;" class="btn p-0 mr-4">
-                        <i class="fas fa-cog fa-2x"></i>
-                    </button>
-                    <!-- export button -->
-                    <button
-                        class="btn btn-primary d-flex align-items-center"
-                        id="exportButton"
+                    <!-- project title -->
+                    <h4
+                        class="ml-3 mt-1"
+                        contenteditable="true"
+                        id="designtitle"
                     >
-                        <i class="fas fa-upload mr-2"></i> Export
-                    </button>
+                        3A3 Seating Plan
+                    </h4>
+                </div>
+                <!-- right column -->
+                <div class="col text-right p-0">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <!-- sort button -->
+                        <button class="btn p-0 mr-4">
+                            <i class="fas fa-sort-alpha-down fa-2x"></i>
+                        </button>
+                        <!-- magic button -->
+                        <button class="btn p-0 mr-4" id="generate">
+                            <i class="fas fa-magic fa-2x"></i>
+                        </button>
+                        <!-- settings button -->
+                        <button
+                            onclick="window.location.href = window.location.pathname + '/settings' + window.location.search;"
+                            class="btn p-0 mr-4"
+                        >
+                            <i class="fas fa-cog fa-2x"></i>
+                        </button>
+                        <!-- export button -->
+                        <button
+                            class="btn btn-primary d-flex align-items-center"
+                            id="exportButton"
+                        >
+                            <i class="fas fa-upload mr-2"></i> Export
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- main content -->
-        <div class="d-flex flex-grow-1 p-0 m-0" id="main-content">
-            <!-- left section (fixed width 25rem)-->
-            <div class="px-4 py-3 ml-4 mb-4" id="left-section">
-                <!-- top row -->
-                <div
-                    class="d-flex justify-content-between align-items-center p-0 m-0"
-                >
-                    <h4 class="m-0">Students</h4>
-                    <div class="col p-0 ml-3">
-                        <!-- import from CSV button -->
-                        <button
-                            id="import-btn"
-                            class="btn btn-outline-secondary btn-block m-0"
-                        >
-                            Import from CSV
-                        </button>
-                        <input
-                            type="file"
-                            id="csv-file"
-                            accept=".csv,.xls,.xlsx"
-                            style="display: none"
-                        />
-
-                        <!-- modal for table editor -->
-                        <div
-                            class="modal fade"
-                            id="table-editor-modal"
-                            tabindex="-1"
-                            role="dialog"
-                            aria-labelledby="tableEditorModalLabel"
-                            aria-hidden="true"
-                        >
-                            <div
-                                class="modal-dialog modal-lg"
-                                role="document"
+            <!-- main content -->
+            <div class="d-flex flex-grow-1 p-0 m-0" id="main-content">
+                <!-- left section (fixed width 25rem)-->
+                <div class="px-4 py-3 ml-4 mb-4" id="left-section">
+                    <!-- top row -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-0 m-0"
+                    >
+                        <h4 class="m-0">Students</h4>
+                        <div class="col p-0 ml-3">
+                            <!-- import from CSV button -->
+                            <button
+                                id="import-btn"
+                                class="btn btn-outline-secondary btn-block m-0"
                             >
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5
-                                            class="modal-title"
-                                            id="tableEditorModalLabel"
-                                        >
-                                            Table Editor
-                                        </h5>
-                                        <button
-                                            type="button"
-                                            class="close"
-                                            data-dismiss="modal"
-                                            aria-label="Close"
-                                        >
-                                            <span aria-hidden="true"
-                                                >&times;</span
+                                Import from CSV
+                            </button>
+                            <input
+                                type="file"
+                                id="csv-file"
+                                accept=".csv,.xls,.xlsx"
+                                style="display: none"
+                            />
+
+                            <!-- modal for table editor -->
+                            <div
+                                class="modal fade"
+                                id="table-editor-modal"
+                                tabindex="-1"
+                                role="dialog"
+                                aria-labelledby="tableEditorModalLabel"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    class="modal-dialog modal-lg"
+                                    role="document"
+                                >
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5
+                                                class="modal-title"
+                                                id="tableEditorModalLabel"
                                             >
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div
-                                            class="d-flex justify-content-end mb-2"
-                                        >
+                                                Table Editor
+                                            </h5>
                                             <button
-                                                id="table-undo"
-                                                class="btn btn-outline-secondary mr-2"
+                                                type="button"
+                                                class="close"
+                                                data-dismiss="modal"
+                                                aria-label="Close"
                                             >
-                                                Undo
-                                            </button>
-                                            <button
-                                                id="table-redo"
-                                                class="btn btn-outline-secondary"
-                                            >
-                                                Redo
+                                                <span aria-hidden="true"
+                                                    >&times;</span
+                                                >
                                             </button>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table
-                                                id="csv-table"
-                                                class="table table-bordered"
+                                        <div class="modal-body">
+                                            <div
+                                                class="d-flex justify-content-end mb-2"
                                             >
-                                                <!-- CSV content will be dynamically inserted here -->
-                                            </table>
+                                                <button
+                                                    id="table-undo"
+                                                    class="btn btn-outline-secondary mr-2"
+                                                >
+                                                    Undo
+                                                </button>
+                                                <button
+                                                    id="table-redo"
+                                                    class="btn btn-outline-secondary"
+                                                >
+                                                    Redo
+                                                </button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table
+                                                    id="csv-table"
+                                                    class="table table-bordered"
+                                                >
+                                                    <!-- CSV content will be dynamically inserted here -->
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button
-                                            type="button"
-                                            id="finish-import"
-                                            class="btn btn-primary"
-                                        >
-                                            Finish
-                                        </button>
+                                        <div class="modal-footer">
+                                            <button
+                                                type="button"
+                                                id="finish-import"
+                                                class="btn btn-primary"
+                                            >
+                                                Finish
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- text input for new student names -->
+                    <input
+                        type="text"
+                        id="new-student"
+                        class="px-2 my-2"
+                        placeholder="Enter new student's name"
+                        style="width: 100%"
+                    />
+                    <p class="mb-2" id="error-message" style="color: red"></p>
+                    <!-- list of students -->
+                    <div
+                        id="students-list"
+                        style="overflow-y: auto; flex-grow: 1"
+                    ></div>
                 </div>
 
-                <!-- text input for new student names -->
-                <input
-                    type="text"
-                    id="new-student"
-                    class="px-2 my-2"
-                    placeholder="Enter new student's name"
-                    style="width: 100%"
-                />
-                <p class="mb-2" id="error-message" style="color: red"></p>
-                <!-- list of students -->
-                <div
-                    id="students-list"
-                    style="overflow-y: auto; flex-grow: 1"
-                ></div>
-            </div>
-
-            <!-- right section -->
-            <div class="flex-grow-1 mx-4 mb-4" id="right-section">
-                <!-- toolbar -->
-                <div
-                    class="d-flex justify-content-between px-4 pt-3 pb-2"
-                    id="toolbar"
-                >
-                    <div class="toolbar-left">
-                        <!-- left-aligned -->
-                        <label for="layout-rows">Layout: </label>
-                        <input
-                            type="number"
-                            id="layout-columns"
-                            value="2"
-                            min="1"
-                            max="50"
-                            style="text-align: center"
-                        />
-                        by
-                        <input
-                            type="number"
-                            id="layout-rows"
-                            value="2"
-                            min="1"
-                            max="50"
-                            style="text-align: center"
-                        />
-                    </div>
-                    <div class="toolbar-right">
-                        <!-- right-aligned undo and redo buttons -->
-                        <button id="undo-btn" class="btn p-0 mr-3">
-                            <i class="fas fa-undo"></i>
-                        </button>
-                        <button id="redo-btn" class="btn p-0">
-                            <i class="fas fa-redo"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- editor layout -->
-                <div
-                    class="layout-container d-flex flex-column justify-content-between"
-                    
-                >
-                    <!-- top add row button -->
-                    <div class="mt-2 d-flex add-row-div">
-                        <button
-                            class="btn btn-outline-primary m-2 add-row up w-100"
-                        >
-                            Add Row
-                        </button>
+                <!-- right section -->
+                <div class="flex-grow-1 mx-4 mb-4" id="right-section">
+                    <!-- toolbar -->
+                    <div
+                        class="d-flex justify-content-between px-4 pt-3 pb-2"
+                        id="toolbar"
+                    >
+                        <div class="toolbar-left">
+                            <!-- left-aligned -->
+                            <label for="layout-rows">Layout: </label>
+                            <input
+                                type="number"
+                                id="layout-columns"
+                                value="2"
+                                min="1"
+                                max="50"
+                                style="text-align: center"
+                            />
+                            by
+                            <input
+                                type="number"
+                                id="layout-rows"
+                                value="2"
+                                min="1"
+                                max="50"
+                                style="text-align: center"
+                            />
+                        </div>
+                        <div class="toolbar-right">
+                            <!-- right-aligned undo and redo buttons -->
+                            <button id="undo-btn" class="btn p-0 mr-3">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            <button id="redo-btn" class="btn p-0">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- middle section -->
-                    <div class="d-flex flex-grow-1">
-                        <!-- left add column button -->
-                        <div class="d-flex flex-row justify-content-center add-column-div">
+                    <!-- editor layout -->
+                    <div
+                        class="layout-container d-flex flex-column justify-content-between"
+                    >
+                        <!-- top add row button -->
+                        <div class="mt-2 d-flex add-row-div">
                             <button
-                                class="btn btn-outline-primary mx-2 add-column left"
-                                style="
-                                    writing-mode: vertical-rl;
-                                    transform: rotate(180deg);
-                                "
+                                class="btn btn-outline-primary m-2 add-row up w-100"
                             >
-                                Add Column
+                                Add Row
                             </button>
                         </div>
 
-                        <!-- center content: seating plan layout -->
-                        <div
-                            id="zoomable-content"
-                            class="bg-info d-flex flex-grow-1 justify-content-center align-items-center"
-                        >
-                            <div class="seating-plan" id="seating-plan">
-                                <!-- seat elements will be dynamically inserted here -->
+                        <!-- middle section -->
+                        <div class="d-flex flex-grow-1">
+                            <!-- left add column button -->
+                            <div
+                                class="d-flex flex-row justify-content-center add-column-div"
+                            >
+                                <button
+                                    class="btn btn-outline-primary mx-2 add-column left"
+                                    style="
+                                        writing-mode: vertical-rl;
+                                        transform: rotate(180deg);
+                                    "
+                                >
+                                    Add Column
+                                </button>
+                            </div>
+
+                            <!-- center content: seating plan layout -->
+                            <div
+                                id="zoomable-content"
+                                class="bg-info d-flex flex-grow-1 justify-content-center align-items-center"
+                            >
+                                <div class="seating-plan" id="seating-plan">
+                                    <!-- seat elements will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- right add column button -->
+                            <div
+                                class="d-flex flex-row justify-content-center add-column-div"
+                            >
+                                <button
+                                    class="btn btn-outline-primary mx-2 add-column right"
+                                    style="writing-mode: vertical-rl"
+                                >
+                                    Add Column
+                                </button>
                             </div>
                         </div>
 
-                        <!-- right add column button -->
-                        <div class="d-flex flex-row justify-content-center add-column-div">
+                        <!-- bottom add row button -->
+                        <div class="d-flex add-row-div">
                             <button
-                                class="btn btn-outline-primary mx-2 add-column right"
-                                style="writing-mode: vertical-rl"
+                                class="btn btn-outline-primary m-2 add-row down w-100"
                             >
-                                Add Column
+                                Add Row
                             </button>
                         </div>
                     </div>
 
-                    <!-- bottom add row button -->
-                    <div class="d-flex add-row-div">
+                    <!-- bottom toolbar -->
+                    <div class="d-flex justify-content-center" id="bottom-bar">
                         <button
-                            class="btn btn-outline-primary m-2 add-row down w-100"
+                            id="zoom-in"
+                            class="btn btn-outline-secondary m-2"
                         >
-                            Add Row
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button
+                            id="zoom-out"
+                            class="btn btn-outline-secondary m-2"
+                        >
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="pan" class="btn btn-outline-secondary m-2">
+                            <i class="fas fa-arrows-alt"></i>
                         </button>
                     </div>
                 </div>
+            </div>
 
-                <!-- bottom toolbar -->
-                <div class="d-flex justify-content-center" id="bottom-bar">
-                    <button
-                        id="zoom-in"
-                        class="btn btn-outline-secondary m-2"
-                    >
-                        <i class="fas fa-search-plus"></i>
-                    </button>
-                    <button
-                        id="zoom-out"
-                        class="btn btn-outline-secondary m-2"
-                    >
-                        <i class="fas fa-search-minus"></i>
-                    </button>
-                    <button id="pan" class="btn btn-outline-secondary m-2">
-                        <i class="fas fa-arrows-alt"></i>
-                    </button>
+            <!-- Context Menu -->
+            <div id="context-menu" class="context-menu">
+                <ul>
+                    <li id="delete-row">Delete Row</li>
+                    <li id="delete-column">Delete Column</li>
+                    <li id="add-row-top">Add Row Top</li>
+                    <li id="add-row-bottom">Add Row Bottom</li>
+                    <li id="add-column-left">Add Column Left</li>
+                    <li id="add-column-right">Add Column Right</li>
+                </ul>
+            </div>
+
+            <!-- bottom help button -->
+            <div class="fixed-bottom d-flex justify-content-end mx-4 my-4">
+                <button class="btn" id="help" style="background-color: white">
+                    <i class="fas fa-question"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Error pop up for duplicate student names -->
+        <div
+            class="modal fade"
+            id="errorModal"
+            tabindex="-1"
+            aria-labelledby="errorModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Duplicate name detected. Please choose a different name.
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- bottom help button -->
-        <div class="fixed-bottom d-flex justify-content-end mx-4 my-4">
-            <button class="btn" id="help" style="background-color: white">
-                <i class="fas fa-question"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Error pop up for duplicate student names -->
-    <div
-        class="modal fade"
-        id="errorModal"
-        tabindex="-1"
-        aria-labelledby="errorModalLabel"
-        aria-hidden="true"
-    >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="errorModalLabel">Error</h5>
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Duplicate name detected. Please choose a different name.
-                </div>
-                <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                    >
-                        Close
-                    </button>
+        <!-- Settings Modal -->
+        <div
+            class="modal fade"
+            id="settingsModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="settingsModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="settingsModalLabel">
+                            Settings
+                        </h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Settings form will be dynamically inserted here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="saveSettingsBtn"
+                        >
+                            Save changes
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Settings Modal -->
-    <div
-        class="modal fade"
-        id="settingsModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="settingsModalLabel"
-        aria-hidden="true"
-    >
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel">
-                        Settings
-                    </h5>
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Settings form will be dynamically inserted here -->
-                </div>
-                <div class="modal-footer">
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        id="saveSettingsBtn"
-                    >
-                        Save changes
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="../js/edit.js" type="module"></script>
-</body>
+        <script src="../js/edit.js" type="module"></script>
+    </body>
 </html>

@@ -40,21 +40,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     applyState(history[historyIndex]);
     document.getElementById("designtitle").innerHTML = name;
-    document.getElementById("designtitle").addEventListener("blur", async function(e) {
-        if (this.innerText == "") {
-            this.innerText = name;
-        } else {    
-            name = this.innerText;
-            e.preventDefault();
-            await update(settings, design, name, history, designs, historyIndex, uid);
-        }
-    });
-    document.getElementById('designtitle').addEventListener('keydown', (evt) => {
-        if (evt.key === "Enter") {
-            evt.preventDefault();
-        }
-    });
-    
+    document
+        .getElementById("designtitle")
+        .addEventListener("blur", async function (e) {
+            if (this.innerText == "") {
+                this.innerText = name;
+            } else {
+                name = this.innerText;
+                e.preventDefault();
+                await update(
+                    settings,
+                    design,
+                    name,
+                    history,
+                    designs,
+                    historyIndex,
+                    uid
+                );
+            }
+        });
+    document
+        .getElementById("designtitle")
+        .addEventListener("keydown", (evt) => {
+            if (evt.key === "Enter") {
+                evt.preventDefault();
+            }
+        });
+
     document.getElementById("editpage").style.display = "flex";
     fadeIn("editpage", 1000);
 });
@@ -63,12 +75,14 @@ function fadeIn(elementId, duration) {
     let element = document.getElementById(elementId);
     element.style.opacity = 0; // Ensure the element is initially hidden
     let last = +new Date();
-    let tick = function() {
-        element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+    let tick = function () {
+        element.style.opacity =
+            +element.style.opacity + (new Date() - last) / duration;
         last = +new Date();
 
         if (+element.style.opacity < 1) {
-            (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+            (window.requestAnimationFrame && requestAnimationFrame(tick)) ||
+                setTimeout(tick, 16);
         }
     };
     tick();
@@ -93,6 +107,15 @@ function updateDraggableSeats() {
         seat.addEventListener("dragover", seatDragOver);
         seat.addEventListener("drop", seatDrop);
         seat.addEventListener("dragleave", seatDragLeave);
+
+        // for context menu
+        seat.addEventListener("mouseenter", () => {
+            seat.classList.add("hover"); // Add hover class if needed for CSS
+        });
+        seat.addEventListener("mouseleave", () => {
+            seat.classList.remove("hover"); // Remove hover class if needed for CSS
+        });
+        seat.addEventListener("contextmenu", showContextMenu); // Right-click event
     });
 }
 
@@ -155,7 +178,8 @@ async function seatDrop(e) {
     });
 
     // Check if the target seat is in the front row
-    const isInFrontRow = targetSeat.parentElement.classList.contains("front-row");
+    const isInFrontRow =
+        targetSeat.parentElement.classList.contains("front-row");
 
     if (!isInFrontRow && targetSeat.classList.contains("occupied")) {
         // If not in the front row and the seat is occupied
@@ -309,8 +333,8 @@ document.getElementById("zoom-out").addEventListener("click", function () {
 document.getElementById("pan").addEventListener("click", function () {
     this.classList.toggle("btn-primary");
     this.classList.toggle("btn-outline-secondary");
-        const zoomableContent = document.getElementById('zoomable-content');
-    const seatingPlan = document.querySelector('.seating-plan');
+    const zoomableContent = document.getElementById("zoomable-content");
+    const seatingPlan = document.querySelector(".seating-plan");
 
     let isPanning = false;
     let startingX = 0;
@@ -318,28 +342,28 @@ document.getElementById("pan").addEventListener("click", function () {
     let translateX = 0;
     let translateY = 0;
 
-    zoomableContent.addEventListener('mousedown', (e) => {
+    zoomableContent.addEventListener("mousedown", (e) => {
         isPanning = true;
         startingX = e.clientX - translateX;
         startingY = e.clientY - translateY;
-        zoomableContent.style.cursor = 'grabbing';
+        zoomableContent.style.cursor = "grabbing";
     });
 
-    zoomableContent.addEventListener('mousemove', (e) => {
+    zoomableContent.addEventListener("mousemove", (e) => {
         if (!isPanning) return;
         translateX = e.clientX - startingX;
         translateY = e.clientY - startingY;
         seatingPlan.style.transform = `translate(${translateX}px, ${translateY}px)`;
     });
 
-    zoomableContent.addEventListener('mouseup', () => {
+    zoomableContent.addEventListener("mouseup", () => {
         isPanning = false;
-        zoomableContent.style.cursor = 'grab';
+        zoomableContent.style.cursor = "grab";
     });
 
-    zoomableContent.addEventListener('mouseleave', () => {
+    zoomableContent.addEventListener("mouseleave", () => {
         isPanning = false;
-        zoomableContent.style.cursor = 'grab';
+        zoomableContent.style.cursor = "grab";
     });
 });
 
@@ -389,7 +413,15 @@ async function applyState(state) {
         attachEventListeners();
         updateDraggableSeats();
         updateSeatingPlan();
-        await update(settings, design, name, history, designs, historyIndex, uid);
+        await update(
+            settings,
+            design,
+            name,
+            history,
+            designs,
+            historyIndex,
+            uid
+        );
     }
 }
 
@@ -486,7 +518,7 @@ async function addColumn(left) {
         while (i < seatlist.length) {
             temp.push(seatlist[i]);
             i += 1;
-            if ((i) % columns == 0) {
+            if (i % columns == 0) {
                 temp.push("");
             }
         }
@@ -739,103 +771,133 @@ function attachEventListeners() {
 
 attachEventListeners();
 
-document.getElementById('generate').addEventListener('click', async function() {
-    var tempStudents = JSON.parse(JSON.stringify(Students));
-    
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
+document
+    .getElementById("generate")
+    .addEventListener("click", async function () {
+        var tempStudents = JSON.parse(JSON.stringify(Students));
 
-    // Shuffle the tempStudents array
-    shuffleArray(tempStudents);
-
-    console.log(tempStudents);
-    var temp = new Array(seatlist.length).fill("");
-    const front = settings['front'];
-    const back = settings['back'];
-    const separate = settings['separate'];
-
-    
-    // Helper function to add students to temp and remove from tempStudents
-    function addStudentsToTemp(studentList, startIndex) {
-        for (var i = 0; i < studentList.length; i++) {
-            if (tempStudents.includes(studentList[i])) {
-                temp[startIndex + i] = studentList[i];
-                tempStudents.splice(tempStudents.indexOf(studentList[i]), 1);
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
         }
-    }
 
-    // Add front students to the beginning of the temp list
-    addStudentsToTemp(front, 0);
+        // Shuffle the tempStudents array
+        shuffleArray(tempStudents);
 
-    // Add back students to the end of the temp list
-    addStudentsToTemp(back, seatlist.length - back.length);
+        console.log(tempStudents);
+        var temp = new Array(seatlist.length).fill("");
+        const front = settings["front"];
+        const back = settings["back"];
+        const separate = settings["separate"];
 
-    // Apply separation constraints
-    function applySeparation(separateList) {
-        if (separateList.length === 0) return;
-
-        // Function to calculate distance between two seats
-        function calculateDistance(index1, index2) {
-            let row1 = Math.floor(index1 / seatlist[0].length);
-            let col1 = index1 % seatlist[0].length;
-            let row2 = Math.floor(index2 / seatlist[0].length);
-            let col2 = index2 % seatlist[0].length;
-            return Math.sqrt(Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2));
-        }
-
-        // Randomly assign the first student
-        let firstStudentIndex = Math.floor(Math.random() * temp.length);
-        temp[firstStudentIndex] = separateList[0];
-        tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
-
-        for (let i = 1; i < separateList.length; i++) {
-            let maxDistance = -1;
-            let bestIndex = -1;
-
-            for (let j = 0; j < temp.length; j++) {
-                if (temp[j] === "") {
-                    let minDistance = Infinity;
-                    for (let k = 0; k < temp.length; k++) {
-                        if (temp[k] !== "" && separateList.includes(temp[k])) {
-                            let distance = calculateDistance(j, k);
-                            minDistance = Math.min(minDistance, distance);
-                        }
-                    }
-                    if (minDistance > maxDistance) {
-                        maxDistance = minDistance;
-                        bestIndex = j;
-                    }
+        // Helper function to add students to temp and remove from tempStudents
+        function addStudentsToTemp(studentList, startIndex) {
+            for (var i = 0; i < studentList.length; i++) {
+                if (tempStudents.includes(studentList[i])) {
+                    temp[startIndex + i] = studentList[i];
+                    tempStudents.splice(
+                        tempStudents.indexOf(studentList[i]),
+                        1
+                    );
                 }
             }
+        }
 
-            if (bestIndex !== -1) {
-                temp[bestIndex] = separateList[i];
-                tempStudents.splice(tempStudents.indexOf(separateList[i]), 1);
+        // Add front students to the beginning of the temp list
+        addStudentsToTemp(front, 0);
+
+        // Add back students to the end of the temp list
+        addStudentsToTemp(back, seatlist.length - back.length);
+
+        // Apply separation constraints
+        function applySeparation(separateList) {
+            if (separateList.length === 0) return;
+
+            // Function to calculate distance between two seats
+            function calculateDistance(index1, index2) {
+                let row1 = Math.floor(index1 / seatlist[0].length);
+                let col1 = index1 % seatlist[0].length;
+                let row2 = Math.floor(index2 / seatlist[0].length);
+                let col2 = index2 % seatlist[0].length;
+                return Math.sqrt(
+                    Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2)
+                );
+            }
+
+            // Randomly assign the first student
+            let firstStudentIndex = Math.floor(Math.random() * temp.length);
+            temp[firstStudentIndex] = separateList[0];
+            tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
+
+            for (let i = 1; i < separateList.length; i++) {
+                let maxDistance = -1;
+                let bestIndex = -1;
+
+                for (let j = 0; j < temp.length; j++) {
+                    if (temp[j] === "") {
+                        let minDistance = Infinity;
+                        for (let k = 0; k < temp.length; k++) {
+                            if (
+                                temp[k] !== "" &&
+                                separateList.includes(temp[k])
+                            ) {
+                                let distance = calculateDistance(j, k);
+                                minDistance = Math.min(minDistance, distance);
+                            }
+                        }
+                        if (minDistance > maxDistance) {
+                            maxDistance = minDistance;
+                            bestIndex = j;
+                        }
+                    }
+                }
+
+                if (bestIndex !== -1) {
+                    temp[bestIndex] = separateList[i];
+                    tempStudents.splice(
+                        tempStudents.indexOf(separateList[i]),
+                        1
+                    );
+                }
             }
         }
-    }
 
-    // Apply separation constraints
-    applySeparation(separate);
+        // Apply separation constraints
+        applySeparation(separate);
 
-    // Fill remaining seats
-    var tempIndex = 0;
-    for (var i = 0; i < temp.length; i++) {
-        if (temp[i] === "") {
-            if (tempIndex < tempStudents.length) {
-                temp[i] = tempStudents[tempIndex];
-                tempIndex++;
+        // Fill remaining seats
+        var tempIndex = 0;
+        for (var i = 0; i < temp.length; i++) {
+            if (temp[i] === "") {
+                if (tempIndex < tempStudents.length) {
+                    temp[i] = tempStudents[tempIndex];
+                    tempIndex++;
+                }
             }
         }
-    }
 
-    // Update the seatlist and save the state
-    seatlist = JSON.parse(JSON.stringify(temp));
-    updateSeatingPlan();
-    await saveState();
-});
+        // Update the seatlist and save the state
+        seatlist = JSON.parse(JSON.stringify(temp));
+        updateSeatingPlan();
+        await saveState();
+    });
+
+
+// context menu stuff
+
+function showContextMenu(event) {
+    event.preventDefault(); // Prevent default context menu
+    const contextMenu = document.getElementById("context-menu"); // Adjust ID to match your context menu
+    contextMenu.style.display = "block";
+    contextMenu.style.left = `${event.pageX}px`;
+    contextMenu.style.top = `${event.pageY}px`;
+    contextMenu.dataset.seatId = event.currentTarget.dataset.seatId; // Save target seat ID
+}
+
+document.addEventListener("click", hideContextMenu);
+function hideContextMenu() {
+    const contextMenu = document.getElementById("context-menu");
+    contextMenu.style.display = "none";
+}
