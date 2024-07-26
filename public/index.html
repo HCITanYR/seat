@@ -4,27 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seating Plan Generator</title>
-    <script type="module">
-        import { createDesign } from './js/template.js';
-        document.getElementById('create').addEventListener('click', () => {
-            // Display an input box when the element is clicked
-            const userInput = prompt("Please enter your input:", "Seating Plan");
-            
-            // Example: Use the input in your createDesign function or handle it as needed
-            if (userInput !== null) {
-                createDesign(userInput, 2, 2, ['', '', '', '']); // Modify this line as needed to use userInput
-            }
-        }
-    );
-    document.getElementById('template').addEventListener('click', () => {
-        // Redirect to the template page when the element is clicked
-        window.location.href = 'template.html';
-    });
-    </script>
-    <script src="js/login.js" type="module"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .design-name{
+        .design-name {
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -70,14 +53,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body style="background-color: #ffffff">
-    <div id="delete-option" style="display:none; position:fixed; z-index: 1000; background-color: white; ">Delete</div>
+    <div id="delete-option" style="display:none; position:fixed; z-index: 1000; background-color: white;">Delete</div>
     <div class="container">
         <div id="loginpage" style="display: none;">
             <div class="d-flex flex-column justify-content-center align-items-center mb-4 border border-dark bg-white m-5 p-5 rounded">
                 <h1>Seating Plan Generator</h1>
-                
                 <p class="m-5">Our seating plan generator is an excellent tool for organizing events, classrooms, or meetings efficiently. It simplifies the task of arranging seats, ensuring optimal placement based on various criteria like preferences, relationships, or roles. Many seating plan generators are free and accessible online, making them a cost-effective solution for both small and large gatherings. Their user-friendly interfaces allow even those with limited technical skills to create and modify seating arrangements effortlessly. By automating this process, these tools save time and reduce the stress associated with planning, making them an invaluable resource for organizers.</p>
-
                 <button id="login" class="btn btn-outline-dark mt-3">Log In</button>
             </div>
         </div>
@@ -88,26 +69,19 @@
             </div>
             <h2>Welcome back, <span id="user-name">Guest</span>!</h2>
             <h3 class="mt-4">Recent designs</h3>
-            <div class="row" id="designRow">
-            </div>
+            <div class="row" id="designRow"></div>
             <h3 class="mt-4">Or, curate a new design:</h3>
             <div class="row">
                 <div class="col-md-4">
                     <div class="new-design" id="create">
-                        <i class="fas fa-plus"></i>
+                        <i class="bi bi-plus-square"></i>
                         <p>Blank</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="new-design" id="template">
-                        <i class="fas fa-file-alt"></i>
+                        <i class="bi bi-file-earmark-text"></i>
                         <p>Templates</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="new-design">
-                        <i class="fas fa-copy"></i>
-                        <p>Duplicate Existing</p>
                     </div>
                 </div>
             </div>
@@ -119,8 +93,46 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <!-- Firebase configuration and initialization -->
-    <script>
-        console.log(window.location.pathname);
+    <script type="module">
+        import { createDesign } from './js/template.js';
+        import './js/login.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const createButton = document.getElementById('create');
+            const templateButton = document.getElementById('template');
+
+            if (createButton) {
+                createButton.addEventListener('click', () => {
+                    const userInput = prompt("Please enter your input:", "Seating Plan");
+                    if (userInput !== null) {
+                        createDesign(userInput, 2, 2, ['', '', '', '']); // Modify this line as needed to use userInput
+                    }
+                });
+            }
+
+            if (templateButton) {
+                templateButton.addEventListener('click', () => {
+                    window.location.href = 'template.html';
+                });
+            }
+        });
+
+        // Example Firebase configuration
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Redirect if needed
         if (window.location.pathname.endsWith('index.html')) {
             window.location.href = '../';
         }
