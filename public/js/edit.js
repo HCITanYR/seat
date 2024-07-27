@@ -786,56 +786,10 @@ function appendStudent(studentName, e = null) {
     addEditEventListener(name);
 }
 
-// Import from CSV
-document.getElementById("import-btn").addEventListener("click", function () {
-    document.getElementById("csv-file").click();
+document.getElementById('import-btn').addEventListener('click', function() {
+    console.log('import from csv');
+    document.getElementById('csv-file').click();
 });
-
-document
-    .getElementById("csv-file")
-    .addEventListener("change", async function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const content = e.target.result;
-                // Assuming content is CSV
-                const rows = content.split("\n");
-                const table = document.getElementById("csv-table");
-                table.innerHTML = ""; // Clear existing table content
-                let isMouseDown = false;
-                table.addEventListener("mousedown", function () {
-                    isMouseDown = true;
-                });
-
-                table.addEventListener("mouseup", function () {
-                    isMouseDown = false;
-                });
-                rows.forEach((row) => {
-                    const cells = row.split(",");
-                    const tr = document.createElement("tr");
-                    cells.forEach((cell) => {
-                        const td = document.createElement("td");
-                        td.className = "unselectable";
-                        td.textContent = cell.trim();
-                        td.addEventListener("mouseover", function () {
-                            if (isMouseDown) {
-                                td.classList.toggle("selected");
-                            }
-                        });
-                        td.addEventListener("mousedown", function () {
-                            td.classList.toggle("selected");
-                        });
-                        tr.appendChild(td);
-                    });
-                    table.appendChild(tr);
-                });
-                $("#table-editor-modal").modal("show");
-            };
-            reader.readAsText(file);
-            await saveState(); // Save state after importing CSV
-        }
-    });
 
 document
     .getElementById("finish-import")
@@ -844,15 +798,18 @@ document
             "#csv-table td.selected"
         );
         const studentList = document.getElementById("students-list");
-
         selectedCells.forEach((cell) => {
-            const newStudent = document.createElement("div");
-            newStudent.className = "student";
-            newStudent.textContent = cell.textContent.trim();
-            addDeleteButton(newStudent); // Add delete button to imported student
-            studentList.appendChild(newStudent);
-            addEditEventListener(newStudent);
+            if (!Students.includes(cell.textContent.trim())) {
+                const newStudent = document.createElement("div");
+                newStudent.className = "student";
+                newStudent.textContent = cell.textContent.trim();
+                addDeleteButton(newStudent); // Add delete button to imported student
+                studentList.appendChild(newStudent);
+                Students.push(cell.textContent.trim());
+                addEditEventListener(newStudent);
+            }
         });
+
 
         $("#table-editor-modal").modal("hide");
         await saveState(); // Save state after importing students to link with main undo/redo
@@ -1049,4 +1006,10 @@ document.getElementById('copyLink').addEventListener('click', function() {
     const link = window.location.href;
     navigator.clipboard.writeText(link);
     alert('Link copied to clipboard!');
+});
+
+document.getElementById('select-all').addEventListener('click', function() {
+    document.getElementById('csv-table').querySelectorAll('td').forEach(cell => {
+        cell.classList.add('selected');
+    });
 });
