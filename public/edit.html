@@ -2,23 +2,17 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
+        <meta name="viewport"content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
         <title>Seating Plan Generator</title>
         <script src="../../js/login.js" type="module"></script>
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-        />
-        <link
-            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
-        <script src=
-"https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
+        <!-- Include jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"rel="stylesheet"/>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
     </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
         <link rel="stylesheet" href="../css/edit.css" />
     </head>
@@ -138,16 +132,10 @@
                                                 class="d-flex justify-content-end mb-2"
                                             >
                                                 <button
-                                                    id="table-undo"
+                                                    id="select-all"
                                                     class="btn btn-outline-secondary mr-2"
                                                 >
-                                                    Undo
-                                                </button>
-                                                <button
-                                                    id="table-redo"
-                                                    class="btn btn-outline-secondary"
-                                                >
-                                                    Redo
+                                                    Select All
                                                 </button>
                                             </div>
                                             <div class="table-responsive">
@@ -419,6 +407,54 @@
                     a.download = 'seating-plan.png';
                     a.click();
                 });
+            });
+        </script>
+        <script>
+            document.getElementById('csv-file').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const content = e.target.result;
+                        // Assuming content is CSV
+                        const rows = content.split('\n');
+                        const table = document.getElementById('csv-table');
+                        table.innerHTML = ''; // Clear existing table content
+                        let isMouseDown = false;
+                        console.log('mouse down detection');
+                        table.addEventListener('mousedown', function() {
+                            isMouseDown = true;
+                            console.log('Mouse is pressed down');
+                        });
+
+                        table.addEventListener('mouseup', function() {
+                            isMouseDown = false;
+                            console.log('Mouse is released');
+                        });
+                        rows.forEach(row => {
+                            const cells = row.split(',');
+                            const tr = document.createElement('tr');
+                            cells.forEach(cell => {
+                                const td = document.createElement('td');
+                                td.className = 'unselectable';
+                                td.textContent = cell.trim();
+                                td.addEventListener('mouseover', function() {
+                                    if (isMouseDown) {
+                                        td.classList.toggle('selected');
+                                    }
+                                });
+                                td.addEventListener('mousedown', function() {
+                                    td.classList.toggle('selected');
+
+                                });
+                                tr.appendChild(td);
+                            });
+                            table.appendChild(tr);
+                        });
+                        $('#table-editor-modal').modal('show');
+                    };
+                    reader.readAsText(file);
+                }
             });
         </script>
         <script src="../js/edit.js" type="module"></script>
