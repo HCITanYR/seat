@@ -946,3 +946,10 @@ document.getElementById('add-column-right').addEventListener('click', function()
     // Add your add column right logic here
     addColumn(false);
 });
+
+document.getElementById('copyLink').addEventListener('click', function() {
+    // Add your copy link logic here
+    const link = window.location.href;
+    navigator.clipboard.writeText(link);
+    alert('Link copied to clipboard!');
+});

@@ -16,6 +16,10 @@
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
             rel="stylesheet"
         />
+        <script src=
+"https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js">
+    </script>
+
         <link rel="stylesheet" href="../css/edit.css" />
     </head>
     <body>
@@ -57,6 +61,10 @@
                             class="btn p-0 mr-4"
                         >
                             <i class="fas fa-cog fa-2x"></i>
+                        </button>
+                        <!--copy link-->
+                        <button class="btn p-0 mr-4" id="copyLink">
+                            <i class="fas fa-copy fa-2x"></i>
                         </button>
                         <!-- export button -->
                         <button
@@ -254,7 +262,7 @@
                             <!-- center content: seating plan layout -->
                             <div
                                 id="zoomable-content"
-                                class="bg-info d-flex flex-grow-1 justify-content-center align-items-center"
+                                class="d-flex flex-grow-1 justify-content-center align-items-center"
                             >
                                 <div class="seating-plan" id="seating-plan">
                                     <!-- seat elements will be dynamically inserted here -->
@@ -401,7 +409,18 @@
                 </div>
             </div>
         </div>
-
+        <script>
+            document.getElementById('exportButton').addEventListener('click', function() {
+                var div = document.getElementById('zoomable-content');
+                html2canvas(div).then(function(canvas) {
+                    var img = canvas.toDataURL('image/png');
+                    var a = document.createElement('a');
+                    a.href = img;
+                    a.download = 'seating-plan.png';
+                    a.click();
+                });
+            });
+        </script>
         <script src="../js/edit.js" type="module"></script>
     </body>
 </html>
