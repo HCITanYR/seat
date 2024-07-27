@@ -120,7 +120,6 @@ function updateDraggableSeats() {
 }
 
 function seatDragStart(e) {
-    console.log("drag start");
     e.dataTransfer.setData("text/plain", e.target.innerText);
     e.dataTransfer.effectAllowed = "move";
 
@@ -178,13 +177,13 @@ async function seatDrop(e) {
     });
 
     // Check if the target seat is in the front row
-    const isInFrontRow =
-        targetSeat.parentElement.classList.contains("front-row");
+    // const isInFrontRow =
+    //     targetSeat.parentElement.classList.contains("front-row");
 
-    if (!isInFrontRow && targetSeat.classList.contains("occupied")) {
-        // If not in the front row and the seat is occupied
-        return; // Prevent dropping students in non-front row occupied seats
-    }
+    // if (!isInFrontRow && targetSeat.classList.contains("occupied")) {
+    //     // If not in the front row and the seat is occupied
+    //     return; // Prevent dropping students in non-front row occupied seats
+    // }
 
     if (targetSeat.classList.contains("unoccupied")) {
         // if empty seat
@@ -505,7 +504,6 @@ async function addRow(up) {
 async function addColumn(left) {
     let i = 0;
     let temp = [];
-    console.log(left);
     if (left) {
         while (i < seatlist.length) {
             if (i % columns == 0) {
@@ -546,6 +544,8 @@ function updateSeatingPlan() {
             rowDiv.classList.add("row");
         }
         const seatDiv = document.createElement("div");
+        seatDiv.classList.add("col" + i % columns);
+        seatDiv.classList.add("row" + Math.floor(i / columns));
         if (seatlist[i] === false) {
             seatDiv.classList.add("seat", "empty");
             seatDiv.classList.add("unselectable");
@@ -786,7 +786,6 @@ document
         // Shuffle the tempStudents array
         shuffleArray(tempStudents);
 
-        console.log(tempStudents);
         var temp = new Array(seatlist.length).fill("");
         const front = settings["front"];
         const back = settings["back"];
@@ -886,18 +885,64 @@ document
 
 
 // context menu stuff
-
+var selectedrow = -1;
+var selectedcol = -1;
 function showContextMenu(event) {
     event.preventDefault(); // Prevent default context menu
     const contextMenu = document.getElementById("context-menu"); // Adjust ID to match your context menu
     contextMenu.style.display = "block";
     contextMenu.style.left = `${event.pageX}px`;
     contextMenu.style.top = `${event.pageY}px`;
-    contextMenu.dataset.seatId = event.currentTarget.dataset.seatId; // Save target seat ID
+    const classList = event.currentTarget.classList;
+    classList.forEach(className => {
+        if (className.startsWith('row')) {
+            selectedrow = parseInt(className.replace('row', ''), 10);
+        }
+        if (className.startsWith('col')) {
+            selectedcol = parseInt(className.replace('col', ''), 10);
+        }
+    });
 }
-
 document.addEventListener("click", hideContextMenu);
 function hideContextMenu() {
     const contextMenu = document.getElementById("context-menu");
     contextMenu.style.display = "none";
 }
+
+
+document.getElementById('delete-row').addEventListener('click', function() {
+    // Add your delete row logic here
+    rows -= 1;
+    seatlist.splice(selectedrow * columns, columns);
+    updateSeatingPlan();
+    saveState();
+});
+
+document.getElementById('delete-column').addEventListener('click', function() {
+    // Add your delete column logic here
+    
+    seatlist = seatlist.filter((_, index) => index % columns !== selectedcol);
+    columns -= 1;
+    updateSeatingPlan();
+    saveState();
+});
+
+document.getElementById('add-row-top').addEventListener('click', function() {
+    // Add your add row top logic here
+    addRow(true);
+});
+
+document.getElementById('add-row-bottom').addEventListener('click', function() {
+    // Add your add row bottom logic here
+    addRow(false);
+});
+
+document.getElementById('add-column-left').addEventListener('click', function() {
+    // Add your add column left logic here
+    addColumn(true);
+});
+
+document.getElementById('add-column-right').addEventListener('click', function() {
+    // Add your add column right logic here
+    addColumn(false);
+});
