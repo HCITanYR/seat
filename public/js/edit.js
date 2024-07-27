@@ -233,9 +233,7 @@ seatingPlanContainer.addEventListener("wheel", (e) => {
         } else if (deltaY > 0 && zoomLevel > 0.2) {
             zoomLevel -= 0.1;
         }
-        document.getElementById(
-            "seating-plan"
-        ).style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
+        seatingPlanContainer.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
     } else {
         // Drag with two-finger scroll
         initialPosX -= e.deltaX;
@@ -253,9 +251,7 @@ seatingPlanContainer.addEventListener("wheel", (e) => {
         if (initialPosY < minY) {
             initialPosY = minY;
         }
-        document.getElementById(
-            "seating-plan"
-        ).style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
+        seatingPlanContainer.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
     }
 });
 
@@ -312,20 +308,123 @@ document.addEventListener("mouseover", handleMouseAction);
 
 //zoom in and out
 
-document.getElementById("zoom-in").addEventListener("click", function () {
-    zoomLevel += 0.1;
-    document.getElementById(
-        "seating-plan"
-    ).style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
-});
+document.addEventListener("DOMContentLoaded", function () {
+    let zoomLevel = 1;
+    let initialPosX = 0;
+    let initialPosY = 0;
+    const minZoomLevel = 0.2;
 
-document.getElementById("zoom-out").addEventListener("click", function () {
-    if (zoomLevel > 0.2) {
-        zoomLevel -= 0.1;
-        document.getElementById(
-            "seating-plan"
-        ).style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
+    const seatingPlanContainer = document.getElementById("zoomable-content");
+    const seatingPlan = document.getElementById("seating-plan");
+
+    function updateTransform() {
+        seatingPlan.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
     }
+
+    document.getElementById("zoom-in").addEventListener("click", function () {
+        const containerRect = seatingPlanContainer.getBoundingClientRect();
+        const seatingPlanRect = seatingPlan.getBoundingClientRect();
+
+        const centerX = containerRect.width / 2;
+        const centerY = containerRect.height / 2;
+
+        const offsetX = (centerX - (seatingPlanRect.left - containerRect.left)) / zoomLevel;
+        const offsetY = (centerY - (seatingPlanRect.top - containerRect.top)) / zoomLevel;
+
+        zoomLevel += 0.1;
+
+        initialPosX -= offsetX * 0.1;
+        initialPosY -= offsetY * 0.1;
+
+        updateTransform();
+    });
+
+    document.getElementById("zoom-out").addEventListener("click", function () {
+        if (zoomLevel > minZoomLevel) {
+            const containerRect = seatingPlanContainer.getBoundingClientRect();
+            const seatingPlanRect = seatingPlan.getBoundingClientRect();
+
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+
+            const offsetX = (centerX - (seatingPlanRect.left - containerRect.left)) / zoomLevel;
+            const offsetY = (centerY - (seatingPlanRect.top - containerRect.top)) / zoomLevel;
+
+            zoomLevel -= 0.1;
+
+            initialPosX += offsetX * 0.1;
+            initialPosY += offsetY * 0.1;
+
+            updateTransform();
+        }
+    });
+
+    // Trackpad functions
+    seatingPlanContainer.addEventListener("wheel", (e) => {
+        if (e.ctrlKey) {
+            // Zoom with two-finger scroll
+            const containerRect = seatingPlanContainer.getBoundingClientRect();
+            const seatingPlanRect = seatingPlan.getBoundingClientRect();
+
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+
+            const offsetX = (centerX - (seatingPlanRect.left - containerRect.left)) / zoomLevel;
+            const offsetY = (centerY - (seatingPlanRect.top - containerRect.top)) / zoomLevel;
+
+            if (e.deltaY < 0) {
+                zoomLevel += 0.1;
+                initialPosX -= offsetX * 0.1;
+                initialPosY -= offsetY * 0.1;
+            } else if (e.deltaY > 0 && zoomLevel > minZoomLevel) {
+                zoomLevel -= 0.1;
+                initialPosX += offsetX * 0.1;
+                initialPosY += offsetY * 0.1;
+            }
+            updateTransform();
+        } else {
+            // Drag with two-finger scroll
+            initialPosX -= e.deltaX;
+            initialPosY -= e.deltaY;
+            updateTransform();
+        }
+    });
+
+    // Pan button functionality
+    document.getElementById("pan").addEventListener("click", function () {
+        this.classList.toggle("btn-primary");
+        this.classList.toggle("btn-outline-secondary");
+
+        const zoomableContent = document.getElementById("zoomable-content");
+
+        let isPanning = false;
+        let startingX = 0;
+        let startingY = 0;
+
+        zoomableContent.addEventListener("mousedown", (e) => {
+            isPanning = true;
+            startingX = e.clientX - initialPosX;
+            startingY = e.clientY - initialPosY;
+            zoomableContent.style.cursor = "grabbing";
+        });
+
+        zoomableContent.addEventListener("mousemove", (e) => {
+            if (!isPanning) return;
+            initialPosX = e.clientX - startingX;
+            initialPosY = e.clientY - startingY;
+            updateTransform();
+        });
+
+        zoomableContent.addEventListener("mouseup", () => {
+            isPanning = false;
+            zoomableContent.style.cursor = "grab";
+        });
+
+        zoomableContent.addEventListener("mouseleave", () => {
+            isPanning = false;
+            zoomableContent.style.cursor = "grab";
+        });
+    });
 });
 
 // pan button
@@ -338,21 +437,19 @@ document.getElementById("pan").addEventListener("click", function () {
     let isPanning = false;
     let startingX = 0;
     let startingY = 0;
-    let translateX = 0;
-    let translateY = 0;
 
     zoomableContent.addEventListener("mousedown", (e) => {
         isPanning = true;
-        startingX = e.clientX - translateX;
-        startingY = e.clientY - translateY;
+        startingX = e.clientX - initialPosX;
+        startingY = e.clientY - initialPosY;
         zoomableContent.style.cursor = "grabbing";
     });
 
     zoomableContent.addEventListener("mousemove", (e) => {
         if (!isPanning) return;
-        translateX = e.clientX - startingX;
-        translateY = e.clientY - startingY;
-        seatingPlan.style.transform = `translate(${translateX}px, ${translateY}px)`;
+        initialPosX = e.clientX - startingX;
+        initialPosY = e.clientY - startingY;
+        seatingPlan.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
     });
 
     zoomableContent.addEventListener("mouseup", () => {
