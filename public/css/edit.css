@@ -134,8 +134,8 @@ body {
     /* Background color for occupied seats */
 }
 .seat.empty {
-    background-color: #ccc;
-    opacity: 0;
+    background-color: transparent;
+    border: black 1px dashed;
     /* Grey for unoccupied seats */
 }
 

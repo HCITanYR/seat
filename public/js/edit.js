@@ -791,51 +791,7 @@ document.getElementById("import-btn").addEventListener("click", function () {
     document.getElementById("csv-file").click();
 });
 
-document
-    .getElementById("csv-file")
-    .addEventListener("change", async function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const content = e.target.result;
-                // Assuming content is CSV
-                const rows = content.split("\n");
-                const table = document.getElementById("csv-table");
-                table.innerHTML = ""; // Clear existing table content
-                let isMouseDown = false;
-                table.addEventListener("mousedown", function () {
-                    isMouseDown = true;
-                });
 
-                table.addEventListener("mouseup", function () {
-                    isMouseDown = false;
-                });
-                rows.forEach((row) => {
-                    const cells = row.split(",");
-                    const tr = document.createElement("tr");
-                    cells.forEach((cell) => {
-                        const td = document.createElement("td");
-                        td.className = "unselectable";
-                        td.textContent = cell.trim();
-                        td.addEventListener("mouseover", function () {
-                            if (isMouseDown) {
-                                td.classList.toggle("selected");
-                            }
-                        });
-                        td.addEventListener("mousedown", function () {
-                            td.classList.toggle("selected");
-                        });
-                        tr.appendChild(td);
-                    });
-                    table.appendChild(tr);
-                });
-                $("#table-editor-modal").modal("show");
-            };
-            reader.readAsText(file);
-            await saveState(); // Save state after importing CSV
-        }
-    });
 
 document
     .getElementById("finish-import")
@@ -844,15 +800,18 @@ document
             "#csv-table td.selected"
         );
         const studentList = document.getElementById("students-list");
-
         selectedCells.forEach((cell) => {
-            const newStudent = document.createElement("div");
-            newStudent.className = "student";
-            newStudent.textContent = cell.textContent.trim();
-            addDeleteButton(newStudent); // Add delete button to imported student
-            studentList.appendChild(newStudent);
-            addEditEventListener(newStudent);
+            if (!Students.includes(cell.textContent.trim())) {
+                const newStudent = document.createElement("div");
+                newStudent.className = "student";
+                newStudent.textContent = cell.textContent.trim();
+                addDeleteButton(newStudent); // Add delete button to imported student
+                studentList.appendChild(newStudent);
+                Students.push(cell.textContent.trim());
+                addEditEventListener(newStudent);
+            }
         });
+
 
         $("#table-editor-modal").modal("hide");
         await saveState(); // Save state after importing students to link with main undo/redo
@@ -907,58 +866,65 @@ document
         // Add back students to the end of the temp list
         addStudentsToTemp(back, seatlist.length - back.length);
 
-        // Apply separation constraints
-        function applySeparation(separateList) {
-            if (separateList.length === 0) return;
+// Apply separation constraints
+function applySeparation(separateList) {
+    if (separateList.length === 0) return;
 
-            // Function to calculate distance between two seats
-            function calculateDistance(index1, index2) {
-                let row1 = Math.floor(index1 / seatlist[0].length);
-                let col1 = index1 % seatlist[0].length;
-                let row2 = Math.floor(index2 / seatlist[0].length);
-                let col2 = index2 % seatlist[0].length;
-                return Math.sqrt(
-                    Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2)
-                );
-            }
+    // Function to calculate distance between two seats
+    function calculateDistance(index1, index2) {
+        let row1 = Math.floor(index1 / seatlist[0].length);
+        let col1 = index1 % seatlist[0].length;
+        let row2 = Math.floor(index2 / seatlist[0].length);
+        let col2 = index2 % seatlist[0].length;
+        return Math.sqrt(
+            Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2)
+        );
+    }
 
-            // Randomly assign the first student
-            let firstStudentIndex = Math.floor(Math.random() * temp.length);
-            temp[firstStudentIndex] = separateList[0];
-            tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
+    // Place front row students first
+    let frontRowLength = seatlist[0].length;
+    for (let i = 0; i < front.length; i++) {
+        temp[i] = front[i];
+        tempStudents.splice(tempStudents.indexOf(front[i]), 1);
+    }
 
-            for (let i = 1; i < separateList.length; i++) {
-                let maxDistance = -1;
-                let bestIndex = -1;
+    // Randomly assign the first student from separateList
+    let firstStudentIndex = Math.floor(Math.random() * temp.length);
+    while (temp[firstStudentIndex] !== "") {
+        firstStudentIndex = Math.floor(Math.random() * temp.length);
+    }
+    temp[firstStudentIndex] = separateList[0];
+    tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
 
-                for (let j = 0; j < temp.length; j++) {
-                    if (temp[j] === "") {
-                        let minDistance = Infinity;
-                        for (let k = 0; k < temp.length; k++) {
-                            if (
-                                temp[k] !== "" &&
-                                separateList.includes(temp[k])
-                            ) {
-                                let distance = calculateDistance(j, k);
-                                minDistance = Math.min(minDistance, distance);
-                            }
-                        }
-                        if (minDistance > maxDistance) {
-                            maxDistance = minDistance;
-                            bestIndex = j;
-                        }
+    for (let i = 1; i < separateList.length; i++) {
+        let maxDistance = -1;
+        let bestIndex = -1;
+
+        for (let j = 0; j < temp.length; j++) {
+            if (temp[j] === "") {
+                let minDistance = Infinity;
+                for (let k = 0; k < temp.length; k++) {
+                    if (
+                        temp[k] !== "" &&
+                        separateList.includes(temp[k])
+                    ) {
+                        let distance = calculateDistance(j, k);
+                        minDistance = Math.min(minDistance, distance);
                     }
                 }
-
-                if (bestIndex !== -1) {
-                    temp[bestIndex] = separateList[i];
-                    tempStudents.splice(
-                        tempStudents.indexOf(separateList[i]),
-                        1
-                    );
+                if (minDistance > maxDistance) {
+                    maxDistance = minDistance;
+                    bestIndex = j;
                 }
             }
         }
+
+        if (bestIndex !== -1) {
+            temp[bestIndex] = separateList[i];
+            tempStudents.splice(tempStudents.indexOf(separateList[i]), 1);
+        }
+    }
+}
 
         // Apply separation constraints
         applySeparation(separate);
@@ -1044,9 +1010,32 @@ document.getElementById('add-column-right').addEventListener('click', function()
     addColumn(false);
 });
 
+document.getElementById('remove-table').addEventListener('click', function() {
+    // Add your add column right logic here
+    seatlist[selectedrow * columns + selectedcol] = false;
+    updateSeatingPlan();
+    saveState();
+});
+
+document.getElementById('show-table').addEventListener('click', function() {
+    // Add your add column right logic here
+    if(seatlist[selectedrow * columns + selectedcol] == false){
+        seatlist[selectedrow * columns + selectedcol] = "";
+    }
+    updateSeatingPlan();
+    saveState();
+});
+
 document.getElementById('copyLink').addEventListener('click', function() {
     // Add your copy link logic here
     const link = window.location.href;
     navigator.clipboard.writeText(link);
     alert('Link copied to clipboard!');
+});
+
+
+document.getElementById('select-all').addEventListener('click', function() {
+    document.getElementById('csv-table').querySelectorAll('td').forEach(cell => {
+        cell.classList.add('selected');
+    });
 });
