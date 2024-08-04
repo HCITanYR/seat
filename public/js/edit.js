@@ -827,128 +827,115 @@ function attachEventListeners() {
 
 attachEventListeners();
 
-document
-    .getElementById("generate")
-    .addEventListener("click", async function () {
-        var tempStudents = JSON.parse(JSON.stringify(Students));
+document.getElementById("generate").addEventListener("click", async function () {
+    var tempStudents = JSON.parse(JSON.stringify(Students));
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // Shuffle the tempStudents array
+    shuffleArray(tempStudents);
+
+    var temp = new Array(seatlist.length).fill("");
+    const front = settings["front"];
+    const back = settings["back"];
+    const separate = settings["separate"];
+
+    shuffleArray(front);
+    shuffleArray(back);
+
+    // Helper function to add students to temp and remove from tempStudents
+    function addStudentsToTemp(studentList, startIndex) {
+        for (var i = 0; i < studentList.length; i++) {
+            if (tempStudents.includes(studentList[i])) {
+                temp[startIndex + i] = studentList[i];
+                tempStudents.splice(tempStudents.indexOf(studentList[i]), 1);
             }
         }
+    }
 
-        // Shuffle the tempStudents array
-        shuffleArray(tempStudents);
+    // Add front students to the beginning of the temp list
+    addStudentsToTemp(front, 0);
 
-        var temp = new Array(seatlist.length).fill("");
-        const front = settings["front"];
-        const back = settings["back"];
-        const separate = settings["separate"];
+    // Add back students to the end of the temp list
+    addStudentsToTemp(back, seatlist.length - back.length);
 
-        shuffleArray(front);
-        shuffleArray(back);
+    // Apply separation constraints
+    function applySeparation(separateList) {
+        if (separateList.length === 0) return;
 
-        // Helper function to add students to temp and remove from tempStudents
-        function addStudentsToTemp(studentList, startIndex) {
-            for (var i = 0; i < studentList.length; i++) {
-                if (tempStudents.includes(studentList[i])) {
-                    temp[startIndex + i] = studentList[i];
-                    tempStudents.splice(
-                        tempStudents.indexOf(studentList[i]),
-                        1
-                    );
-                }
-            }
+        // Function to calculate distance between two seats
+        function calculateDistance(index1, index2) {
+            let row1 = Math.floor(index1 / seatlist[0].length);
+            let col1 = index1 % seatlist[0].length;
+            let row2 = Math.floor(index2 / seatlist[0].length);
+            let col2 = index2 % seatlist[0].length;
+            return Math.sqrt(
+                Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2)
+            );
         }
 
-        // Add front students to the beginning of the temp list
-        addStudentsToTemp(front, 0);
+        // Randomly assign the first student from separateList
+        let firstStudentIndex = Math.floor(Math.random() * temp.length);
+        while (temp[firstStudentIndex] !== "") {
+            firstStudentIndex = Math.floor(Math.random() * temp.length);
+        }
+        temp[firstStudentIndex] = separateList[0];
+        tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
 
-        // Add back students to the end of the temp list
-        addStudentsToTemp(back, seatlist.length - back.length);
+        for (let i = 1; i < separateList.length; i++) {
+            let maxDistance = -1;
+            let bestIndex = -1;
 
-// Apply separation constraints
-function applySeparation(separateList) {
-    if (separateList.length === 0) return;
-
-    // Function to calculate distance between two seats
-    function calculateDistance(index1, index2) {
-        let row1 = Math.floor(index1 / seatlist[0].length);
-        let col1 = index1 % seatlist[0].length;
-        let row2 = Math.floor(index2 / seatlist[0].length);
-        let col2 = index2 % seatlist[0].length;
-        return Math.sqrt(
-            Math.pow(row1 - row2, 2) + Math.pow(col1 - col2, 2)
-        );
-    }
-
-    // Place front row students first
-    let frontRowLength = seatlist[0].length;
-    for (let i = 0; i < front.length; i++) {
-        temp[i] = front[i];
-        tempStudents.splice(tempStudents.indexOf(front[i]), 1);
-    }
-
-    // Randomly assign the first student from separateList
-    let firstStudentIndex = Math.floor(Math.random() * temp.length);
-    while (temp[firstStudentIndex] !== "") {
-        firstStudentIndex = Math.floor(Math.random() * temp.length);
-    }
-    temp[firstStudentIndex] = separateList[0];
-    tempStudents.splice(tempStudents.indexOf(separateList[0]), 1);
-
-    for (let i = 1; i < separateList.length; i++) {
-        let maxDistance = -1;
-        let bestIndex = -1;
-
-        for (let j = 0; j < temp.length; j++) {
-            if (temp[j] === "") {
-                let minDistance = Infinity;
-                for (let k = 0; k < temp.length; k++) {
-                    if (
-                        temp[k] !== "" &&
-                        separateList.includes(temp[k])
-                    ) {
-                        let distance = calculateDistance(j, k);
-                        minDistance = Math.min(minDistance, distance);
+            for (let j = 0; j < temp.length; j++) {
+                if (temp[j] === "") {
+                    let minDistance = Infinity;
+                    for (let k = 0; k < temp.length; k++) {
+                        if (
+                            temp[k] !== "" &&
+                            separateList.includes(temp[k])
+                        ) {
+                            let distance = calculateDistance(j, k);
+                            minDistance = Math.min(minDistance, distance);
+                        }
+                    }
+                    if (minDistance > maxDistance) {
+                        maxDistance = minDistance;
+                        bestIndex = j;
                     }
                 }
-                if (minDistance > maxDistance) {
-                    maxDistance = minDistance;
-                    bestIndex = j;
-                }
             }
-        }
 
-        if (bestIndex !== -1) {
-            temp[bestIndex] = separateList[i];
-            tempStudents.splice(tempStudents.indexOf(separateList[i]), 1);
+            if (bestIndex !== -1) {
+                temp[bestIndex] = separateList[i];
+                tempStudents.splice(tempStudents.indexOf(separateList[i]), 1);
+            }
         }
     }
-}
 
-        // Apply separation constraints
-        applySeparation(separate);
+    // Apply separation constraints
+    applySeparation(separate);
 
-        // Fill remaining seats
-        var tempIndex = 0;
-        for (var i = 0; i < temp.length; i++) {
-            if (temp[i] === "") {
-                if (tempIndex < tempStudents.length) {
-                    temp[i] = tempStudents[tempIndex];
-                    tempIndex++;
-                }
+    // Fill remaining seats
+    var tempIndex = 0;
+    for (var i = 0; i < temp.length; i++) {
+        if (temp[i] === "") {
+            if (tempIndex < tempStudents.length) {
+                temp[i] = tempStudents[tempIndex];
+                tempIndex++;
             }
         }
+    }
 
-        // Update the seatlist and save the state
-        seatlist = JSON.parse(JSON.stringify(temp));
-        updateSeatingPlan();
-        await saveState();
-    });
-
+    // Update the seatlist and save the state
+    seatlist = JSON.parse(JSON.stringify(temp));
+    updateSeatingPlan();
+    await saveState();
+});
 
 // context menu stuff
 var selectedrow = -1;
