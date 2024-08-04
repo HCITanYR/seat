@@ -220,7 +220,7 @@ function seatDragEnd(e) {
 }
 
 // Zoom in and zoom out functionality
-let zoomLevel = 1;
+let zoomLevel = 0.5;
 
 // trackpad functions
 const seatingPlanContainer = document.getElementById("seating-plan");

@@ -3,9 +3,12 @@
 <head>
     <script type="module" src="js/template.js"></script>
     <script type="module">
-        import {Auditorium} from './js/template.js';
+        import {Auditorium, Classroom} from './js/template.js';
         document.getElementById('audi').addEventListener('click', async () => {
             await Auditorium();
+        });
+        document.getElementById('classroom').addEventListener('click', async () => {
+            await Classroom();
         });
     </script>
     <meta charset="UTF-8">
@@ -77,8 +80,8 @@
         <div class="template" id="audi">
             Auditorium
         </div>
-        <div class="template" id="dc">
-            Drama Center
+        <div class="template" id="classroom">
+           Classroom 6x6
         </div>
     </main>
 </body>
