@@ -847,6 +847,9 @@ document
         const back = settings["back"];
         const separate = settings["separate"];
 
+        shuffleArray(front);
+        shuffleArray(back);
+
         // Helper function to add students to temp and remove from tempStudents
         function addStudentsToTemp(studentList, startIndex) {
             for (var i = 0; i < studentList.length; i++) {
