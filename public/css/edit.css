@@ -97,9 +97,6 @@ body {
     overflow: hidden;
     position: relative;
     background-color:#f5f5f5;
-    background-image: 
-        linear-gradient(to right, #ccc 1px, transparent 1px),
-        linear-gradient(to bottom, #ccc 1px, transparent 1px);
     background-size: 20px 20px; /* Adjust the size of the grid cells */
 }
 .row {
