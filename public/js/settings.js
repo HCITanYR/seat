@@ -20,36 +20,72 @@ for (const item in designweusing["data"]) {
 const Students = JSON.parse(history[historyIndex].students);   
 var settings = designweusing["settings"];     
 populateDropdowns();    
+
 // Function to populate dropdowns with options from the Students array
 function populateDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown-select');
+    let isDragging = false;
+    let startOption = null;
+    let lastOption = null;
+
     for (let j = 0; j < dropdowns.length; j++) {
         const dropdown = dropdowns[j];
         dropdown.innerHTML = ''; // Clear existing options
-        for(var i=0; i<Students.length; i++){
+
+        for (var i = 0; i < Students.length; i++) {
             const option = document.createElement('option');
             option.textContent = Students[i];
             option.selected = settings[dropdownList[j]].includes(Students[i]);
+
             option.addEventListener('mousedown', function(event) {
                 // Prevent the default behavior to allow for toggling
                 event.preventDefault();
+                isDragging = true;
+                startOption = this;
+                lastOption = this;
+
                 // Toggle the selected state
                 this.selected = !this.selected;
-                if (this.selected) {
-                    // Add the selected value to the settings object
-                    if (!settings[dropdownList[j]].includes(this.textContent)) {
-                        settings[dropdownList[j]].push(this.textContent);
-                    }
-                } else {
-                    // Remove the selected value from the settings object
-                    settings[dropdownList[j]] = settings[dropdownList[j]].filter(value => value !== this.textContent);
-                }
-                // To reflect changes, trigger the 'change' event on the select element if needed
-                dropdown.dispatchEvent(new Event('change'));
+                updateSettings(this, dropdownList[j]);
             });
+
+            option.addEventListener('mousemove', function(event) {
+                if (isDragging && this !== lastOption) {
+                    this.selected = !this.selected;
+                    updateSettings(this, dropdownList[j]);
+                    lastOption = this;
+                }
+            });
+
+            option.addEventListener('mouseup', function(event) {
+                isDragging = false;
+                startOption = null;
+                lastOption = null;
+            });
+
             dropdown.appendChild(option);
         }
-    };
+
+        document.addEventListener('mouseup', function(event) {
+            isDragging = false;
+            startOption = null;
+            lastOption = null;
+        });
+    }
+}
+
+function updateSettings(option, dropdownKey) {
+    if (option.selected) {
+        // Add the selected value to the settings object
+        if (!settings[dropdownKey].includes(option.textContent)) {
+            settings[dropdownKey].push(option.textContent);
+        }
+    } else {
+        // Remove the selected value from the settings object
+        settings[dropdownKey] = settings[dropdownKey].filter(value => value !== option.textContent);
+    }
+    // To reflect changes, trigger the 'change' event on the select element if needed
+    option.parentElement.dispatchEvent(new Event('change'));
 }
 
 function fadeIn(elementId, duration) {

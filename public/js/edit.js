@@ -1049,20 +1049,20 @@ document.getElementById('alpha').addEventListener('click', function() {
 
     // Shuffle the tempStudents array
     tempStudents = sortArrayAlphabetically(tempStudents);
-    console.log(tempStudents);
 
     var temp = new Array(seatlist.length).fill("");
 
     // Helper function to add students to temp and remove from tempStudents
+    
     console.log(tempStudents.length);
     for (var i = 0; i < tempStudents.length; i++) {
         if (tempStudents.includes(tempStudents[i])) {
-            temp[i] = tempStudents[i];
-            console.log(tempStudents[i]);
+            temp[columns * (i % columns) + Math.floor(i/columns)] = tempStudents[i];
         } else {
             console.log("error");
         }
     }
+    
     console.log(temp);
     seatlist = JSON.parse(JSON.stringify(temp));
     updateSeatingPlan();
