@@ -24,9 +24,6 @@ populateDropdowns();
 // Function to populate dropdowns with options from the Students array
 function populateDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown-select');
-    let isDragging = false;
-    let startOption = null;
-    let lastOption = null;
 
     for (let j = 0; j < dropdowns.length; j++) {
         const dropdown = dropdowns[j];
@@ -38,39 +35,15 @@ function populateDropdowns() {
             option.selected = settings[dropdownList[j]].includes(Students[i]);
 
             option.addEventListener('mousedown', function(event) {
-                // Prevent the default behavior to allow for toggling
+                // Prevent the default behavior to avoid scrolling back up
                 event.preventDefault();
-                isDragging = true;
-                startOption = this;
-                lastOption = this;
-
-                // Toggle the selected state
                 this.selected = !this.selected;
                 updateSettings(this, dropdownList[j]);
-            });
-
-            option.addEventListener('mousemove', function(event) {
-                if (isDragging && this !== lastOption) {
-                    this.selected = !this.selected;
-                    updateSettings(this, dropdownList[j]);
-                    lastOption = this;
-                }
-            });
-
-            option.addEventListener('mouseup', function(event) {
-                isDragging = false;
-                startOption = null;
-                lastOption = null;
             });
 
             dropdown.appendChild(option);
         }
 
-        document.addEventListener('mouseup', function(event) {
-            isDragging = false;
-            startOption = null;
-            lastOption = null;
-        });
     }
 }
 

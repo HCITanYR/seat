@@ -1091,3 +1091,9 @@ document.getElementById('alpha').addEventListener('click', function() {
     updateSeatingPlan();
     saveState();
 });
+
+document.getElementById('view').addEventListener('click', function() {
+    seatlist.reverse();
+    updateSeatingPlan();
+    saveState();
+});
