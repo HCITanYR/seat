@@ -828,6 +828,29 @@ function attachEventListeners() {
 attachEventListeners();
 
 document.getElementById("generate").addEventListener("click", async function () {
+    // Function to show error message
+    function showError(message) {
+        const errorElement = document.getElementById("error-message");
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = "block";
+        } else {
+            const errorDiv = document.createElement("div");
+            errorDiv.id = "error-message";
+            errorDiv.style.color = "red";
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+        }
+    }
+
+    // Function to hide error message
+    function hideError() {
+        const errorElement = document.getElementById("error-message");
+        if (errorElement) {
+            errorElement.style.display = "none";
+        }
+    }
+
     var tempStudents = JSON.parse(JSON.stringify(Students));
 
     function shuffleArray(array) {
@@ -837,13 +860,23 @@ document.getElementById("generate").addEventListener("click", async function () 
         }
     }
 
+    const front = settings["front"];
+    const back = settings["back"];
+    const separate = settings["separate"];
+
+    // Check for duplicates in front and back lists
+    const duplicates = front.filter(student => back.includes(student));
+    if (duplicates.length > 0) {
+        showError(`The following student(s) are selected in both "sit in front" and "sit at back": ${duplicates.join(", ")}`);
+        return;
+    } else {
+        hideError();
+    }
+
     // Shuffle the tempStudents array
     shuffleArray(tempStudents);
 
     var temp = new Array(seatlist.length).fill("");
-    const front = settings["front"];
-    const back = settings["back"];
-    const separate = settings["separate"];
 
     shuffleArray(front);
     shuffleArray(back);
