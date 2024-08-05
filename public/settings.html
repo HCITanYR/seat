@@ -6,199 +6,207 @@
     <title>Seating Plan Settings</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
+       body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
 
-        .container {
-            background-color: #fff;
-            padding: 50px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100vw; /* Full width */
+    height: 100vh; /* Full height */
+    max-width: none; /* Remove max-width constraint */
+    max-height: none; /* Remove max-height constraint */
+    overflow-y: auto;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        h1 {
-            text-align: center;
-            font-weight: bold;
-            display: none;
-        }
+h1 {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+#settingsForm {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        #settings{
-            opacity: 0;
-        }
+.form-column {
+    flex: 1;
+    padding: 1%;
+}
 
-        label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+}
 
-        .bi-tag-fill, .bi-lock-fill {
-            margin-right: 5px;
-        }
+label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
 
-        .input-container {
-            display: flex;
-            align-items: center;
-        }
+.bi-tag-fill, .bi-lock-fill {
+    margin-right: 5px;
+}
 
-        input {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+.input-container {
+    display: flex;
+    align-items: center;
+}
 
-        .add-btn {
-            width: 40px;
-            margin-left: 5px;
-            background-color: #ccc;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
+input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
 
-        .add-btn:hover {
-            background-color: #aaa;
-        }
+.add-btn {
+    width: 40px;
+    margin-left: 5px;
+    background-color: #ccc;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
 
-        .form-column {
-            display: inline-block;
-            vertical-align: top;
-            width: 48%;
-            padding: 1%;
-        }
+.add-btn:hover {
+    background-color: #aaa;
+}
 
-        #settingsForm {
-            display: flex;
-            justify-content: space-between;
-        }
+.student-list {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+}
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: transparent;
-            color: #000;
-            border: none;
-            font-size: 30px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+.student-list li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .close-btn:hover {
-            color: #555;
-        }
+.input-separate {
+    position: relative;
+}
 
-        .student-list {
-            list-style-type: none;
-            padding: 0;
-        }
+.input-separate input {
+    width: 100%;
+    padding-right: 50px;
+}
 
-        .student-list li {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.input-separate .add-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    margin: 0;
+    border-radius: 0 5px 5px 0;
+}
 
-        .input-separate {
-            position: relative;
-        }
+.submit-btn {
+    display: none;
+}
 
-        .input-separate input {
-            width: 100%;
-            padding-right: 50px;
-        }
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
 
-        .input-separate .add-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            margin: 0;
-            border-radius: 0 5px 5px 0;
-        }
+.dropdown-select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
 
-        .submit-btn {
-            display: none;
-        }
+.dropdown-menu {
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
 
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
+.dropdown-menu-item {
+    padding: 10px;
+    cursor: pointer;
+}
 
-        .dropdown-select {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+.dropdown-menu-item:hover {
+    background-color: #ddd;
+}
 
-        .dropdown-menu {
-            position: absolute;
-            background-color: #f9f9f9;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-            z-index: 1;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+.save-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 20px;
+}
 
-        .dropdown-menu-item {
-            padding: 10px;
-            cursor: pointer;
-        }
+.save-btn:hover {
+    background-color: #0056b3;
+}
 
-        .dropdown-menu-item:hover {
-            background-color: #ddd;
-        }
-        .save-btn {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    color: #000;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 10;
+}
 
-        .save-btn:hover {
-            background-color: #0056b3;
-        }
+.close-btn:hover {
+    color: #555;
+}
     </style>
 </head>
 <body>
@@ -227,7 +235,6 @@
                     </div>
                 </div>
                 <ul id="backRowList" class="student-list"></ul>
-                <ul id="createTagList" class="student-list"></ul>
             </div>
             <div class="form-column">
                 <div class="form-group">
@@ -239,6 +246,7 @@
                         </select>
                     </div>
                 </div>
+                <ul id="createTagList" class="student-list"></ul>
             </div>
         </form>
         <button id="submit" class='save-btn'>Save</button>
