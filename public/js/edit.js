@@ -885,11 +885,15 @@ document.getElementById("generate").addEventListener("click", async function () 
 
     // Helper function to add students to temp and remove from tempStudents
     function addStudentsToTemp(studentList, startIndex) {
-        for (var i = 0; i < studentList.length; i++) {
+        var i = 0;
+        while (i < studentList.length) {
             if (tempStudents.includes(studentList[i])) {
-                temp[startIndex + i] = studentList[i];
-                tempStudents.splice(tempStudents.indexOf(studentList[i]), 1);
+                if(temp[startIndex + i] === "") {
+                    temp[startIndex + i] = studentList[i];
+                    tempStudents.splice(tempStudents.indexOf(studentList[i]), 1);
+                }
             }
+            i++; // Increment i to avoid infinite loop
         }
     }
 
