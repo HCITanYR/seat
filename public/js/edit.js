@@ -726,6 +726,8 @@ function addEditEventListener(student) {
                 } else {
                     e.target.parentElement.textContent = newName;
                     Students[Students.indexOf(originalName)] = newName;
+                    seatlist[seatlist.indexOf(originalName)] = newName;
+                    updateSeatingPlan();
                     await saveState(); // Save state after editing a student name
                 }
             } else {
@@ -876,7 +878,7 @@ document.getElementById("generate").addEventListener("click", async function () 
     // Shuffle the tempStudents array
     shuffleArray(tempStudents);
 
-    var temp = new Array(seatlist.length).fill("");
+    var temp = seatlist.map(item => typeof item === 'string' ? "" : false);
 
     shuffleArray(front);
     shuffleArray(back);
@@ -1073,21 +1075,29 @@ document.getElementById('alpha').addEventListener('click', function() {
     // Shuffle the tempStudents array
     tempStudents = sortArrayAlphabetically(tempStudents);
 
-    var temp = new Array(seatlist.length).fill("");
-
+    var temp = seatlist.map(item => typeof item === 'string' ? "" : false);
     // Helper function to add students to temp and remove from tempStudents
-    
-    console.log(tempStudents.length);
-    for (var i = 0; i < tempStudents.length; i++) {
-        if (tempStudents.includes(tempStudents[i])) {
-            temp[columns * (i % columns) + Math.floor(i/columns)] = tempStudents[i];
-        } else {
-            console.log("error");
+    var i = 0;
+    var j = 0;
+    while (j < tempStudents.length) {
+        if (temp[columns * (i % columns) + Math.floor(i/columns)] !== false){
+            if (tempStudents.includes(tempStudents[j])) {
+                temp[columns * (i % columns) + Math.floor(i/columns)] = tempStudents[j];
+                console.log(tempStudents[j]);
+                j++;
+            } else {
+                console.log('empty chair');
+            }
         }
+        i++;
     }
-    
-    console.log(temp);
     seatlist = JSON.parse(JSON.stringify(temp));
+    updateSeatingPlan();
+    saveState();
+});
+
+document.getElementById('view').addEventListener('click', function() {
+    seatlist.reverse();
     updateSeatingPlan();
     saveState();
 });
