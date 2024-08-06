@@ -268,8 +268,8 @@ let startX,
     startY,
     initialPosX = 0,
     initialPosY = 0;
-
-// mouse icons + pan functionality
+/*
+    // mouse icons + pan functionality
 detect.addEventListener("mousedown", (e) => {
     if (
         !document.getElementById("pan").classList.contains("btn-primary") &&
@@ -289,6 +289,7 @@ document.addEventListener("mousemove", (e) => {
     // TODO: add pan stuff
     // disable seat drag and drop
 });
+*/
 function handleMouseAction(e) {
     updateDraggableSeats(); // enable seat dragging
     if (document.getElementById("pan").classList.contains("btn-primary")) {
@@ -390,79 +391,80 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Pan button functionality
-    document.getElementById("pan").addEventListener("click", function () {
-        this.classList.toggle("btn-primary");
-        this.classList.toggle("btn-outline-secondary");
-
-        const zoomableContent = document.getElementById("zoomable-content");
-
-        let isPanning = false;
-        let startingX = 0;
-        let startingY = 0;
-
-        zoomableContent.addEventListener("mousedown", (e) => {
-            isPanning = true;
-            startingX = e.clientX - initialPosX;
-            startingY = e.clientY - initialPosY;
-            zoomableContent.style.cursor = "grabbing";
-        });
-
-        zoomableContent.addEventListener("mousemove", (e) => {
-            if (!isPanning) return;
-            initialPosX = e.clientX - startingX;
-            initialPosY = e.clientY - startingY;
-            updateTransform();
-        });
-
-        zoomableContent.addEventListener("mouseup", () => {
-            isPanning = false;
-            zoomableContent.style.cursor = "grab";
-        });
-
-        zoomableContent.addEventListener("mouseleave", () => {
-            isPanning = false;
-            zoomableContent.style.cursor = "grab";
-        });
-    });
-});
-
-// pan button
-document.getElementById("pan").addEventListener("click", function () {
+let isPanningActive = false; // Track the state of the pan mode
+    
+const zoomableContent = document.getElementById("zoomable-content");
+const panButton = document.getElementById("pan");
+    
+panButton.addEventListener("click", function () {
     this.classList.toggle("btn-primary");
     this.classList.toggle("btn-outline-secondary");
-    const zoomableContent = document.getElementById("zoomable-content");
-    const seatingPlan = document.querySelector(".seating-plan");
-
+    
+    isPanningActive = !isPanningActive;
+    if (isPanningActive) {
+        enablePanning();
+    } else {
+        disablePanning();
+    }
+});
+    
+function enablePanning() {
     let isPanning = false;
     let startingX = 0;
     let startingY = 0;
-
-    zoomableContent.addEventListener("mousedown", (e) => {
+    
+    zoomableContent.addEventListener("mousedown", startPan);
+    zoomableContent.addEventListener("mousemove", movePan);
+    zoomableContent.addEventListener("mouseup", endPan);
+    zoomableContent.addEventListener("mouseleave", endPan);
+    
+    function startPan(e) {
         isPanning = true;
         startingX = e.clientX - initialPosX;
         startingY = e.clientY - initialPosY;
         zoomableContent.style.cursor = "grabbing";
-    });
-
-    zoomableContent.addEventListener("mousemove", (e) => {
+    }
+    
+    function movePan(e) {
         if (!isPanning) return;
         initialPosX = e.clientX - startingX;
         initialPosY = e.clientY - startingY;
         seatingPlan.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
-    });
-
-    zoomableContent.addEventListener("mouseup", () => {
+    }
+    
+    function endPan() {
         isPanning = false;
         zoomableContent.style.cursor = "grab";
-    });
-
-    zoomableContent.addEventListener("mouseleave", () => {
-        isPanning = false;
-        zoomableContent.style.cursor = "grab";
-    });
+    }
+}
+    
+function disablePanning() {
+    zoomableContent.removeEventListener("mousedown", startPan);
+    zoomableContent.removeEventListener("mousemove", movePan);
+    zoomableContent.removeEventListener("mouseup", endPan);
+    zoomableContent.removeEventListener("mouseleave", endPan);
+    zoomableContent.style.cursor = "default";
+}
+    
+function startPan(e) {
+    isPanning = true;
+    startingX = e.clientX - initialPosX;
+    startingY = e.clientY - initialPosY;
+    zoomableContent.style.cursor = "grabbing";
+}
+    
+function movePan(e) {
+    if (!isPanning) return;
+    initialPosX = e.clientX - startingX;
+    initialPosY = e.clientY - startingY;
+    seatingPlan.style.transform = `translate(${initialPosX}px, ${initialPosY}px) scale(${zoomLevel})`;
+}
+    
+function endPan() {
+    isPanning = false;
+    zoomableContent.style.cursor = "grab";
+}
 });
-
 async function saveState() {
     seatlist = [];
     Array.from(document.getElementById("seating-plan").children).forEach(
